@@ -1,5 +1,5 @@
 CC=g++
-CFLAG=-Wno-deprecated -std=gnu++0x
+CFLAG=-Wno-deprecated -fpermissive -std=gnu++0x
 INC=-I/users/outil/dsx/cctools/include
 LD=-L/users/outil/dsx/cctools/lib-linux
 OPT=-m32
