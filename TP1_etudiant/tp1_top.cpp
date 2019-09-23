@@ -22,49 +22,46 @@ int sc_main(int argc, char *argv[])
 	/////////////////////////////////////////////////////////////////
         // Signals
 	/////////////////////////////////////////////////////////////////
-        sc_clock                		signal_clk("signal_clk", sc_time( 1, SC_NS ), 0.5 );
-        sc_signal<bool> 			signal_resetn("signal_resetn");
-        FifoSignals<uint32_t> 			signal_fifo_m2c("signal_m2c");
-	A COMPLETER
+        sc_clock			signal_clk("signal_clk", sc_time( 1, SC_NS ), 0.5 );
+        sc_signal<bool>			signal_resetn("signal_resetn");
+        FifoSignals<uint32_t>		signal_fifo_m2c("signal_m2c");
+        FifoSignals<uint32_t>		signal_fifo_c2m("signal_c2m");
 
 	/////////////////////////////////////////////////////////////////
 	// Components
 	/////////////////////////////////////////////////////////////////
-        FifoGcdMaster 				master(A COMPLETER);
-	FifoGcdCoprocessor			coproc(A COMPLETER);
+        FifoGcdMaster				master("master", seed);
+	FifoGcdCoprocessor			coproc("coproc");
 
 	/////////////////////////////////////////////////////////////////
 	// Net-List
 	/////////////////////////////////////////////////////////////////
-	master.p_clk(signal_clk); 
+	master.p_clk(signal_clk);
 	master.p_resetn(signal_resetn);
 	master.p_in(signal_fifo_c2m);
 	master.p_out(signal_fifo_m2c);
-	A COMPLETER
+
+	coproc.p_clk(signal_clk);
+	coproc.p_resetn(signal_resetn);
+	coproc.p_in(signal_fifo_m2c);
+	coproc.p_out(signal_fifo_c2m);
+
 
 	/////////////////////////////////////////////////////////////////
 	// simulation
 	/////////////////////////////////////////////////////////////////
-	sc_start(0;
+	//sc_start(0); //
+	//sc_start( sc_time( 1, SC_NS ) ) ;
+	//sc_start( sc_time( 1, SC_NS ) ) ;
 
 	signal_resetn = false;
-	sc_start( sc_time( 1, SC_NS ) ) ;
 
+	// gestion du cycle, cette fonction increment les cycles, execute un
+	// nouveau front d'horloge a chaque seconde : proc a 1 giga
+	sc_start( sc_time( 1, SC_NS ) ) ;
 	signal_resetn = true;
 	for (size_t n=1 ; n<ncycles ; n++ )  sc_start( sc_time( 1, SC_NS ) ) ;
 
 	return(0);
 
 } // end sc_main
-
-
-
-
-
-
-
-
-
-
-
-

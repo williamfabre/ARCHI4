@@ -49,24 +49,39 @@ class FifoGcdCoprocessor
 	: public sc_core::sc_module
 {
 	enum coprocessor_fsm_state_e {
-		A COMPLETER
+        READ_OPA,
+        READ_OPB,
+        COMPARE,
+        DECR_A,
+        DECR_B,
+        WRITE_RES,
 	};
 
-	// Registers
-		A COMPLETER
+	// Registers interne de l'automate
+	sc_core::sc_signal<int>			    r_fsm;
+    sc_core::sc_signal<uint32_t>		r_opa;
+    sc_core::sc_signal<uint32_t>		r_opb;
+
 
 protected:
 	SC_HAS_PROCESS(FifoGcdCoprocessor);
 
 public:
 	// ports
-		A COMPLETER
+    sc_core::sc_in<bool>			p_resetn;
+    sc_core::sc_in<bool>			p_clk;
+    soclib::caba::FifoInput<uint32_t>	p_in;
+    soclib::caba::FifoOutput<uint32_t>	p_out;
 
 	// constructor & destructor
-		A COMPLETER
+FifoGcdCoprocessor( sc_module_name insname );
+
+~FifoGcdCoprocessor( );
+
 private:
 	// member functions
-		A COMPLETER
+        void transition();
+        void genMoore();
 
 }; // end class FifoGcdCoprocessor
 

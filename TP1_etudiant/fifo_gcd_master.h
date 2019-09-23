@@ -57,17 +57,17 @@ class FifoGcdMaster
 		RANDOM,
 		WRITE_OPA,
 		WRITE_OPB,
-                READ_RES,
+        READ_RES,
 		DISPLAY,
 	};
 
 	// Registers
 	sc_core::sc_signal<int>			r_fsm;
-        sc_core::sc_signal<uint32_t>   		r_opa;
-        sc_core::sc_signal<uint32_t>   		r_opb;
-        sc_core::sc_signal<uint32_t>   		r_res;
-        sc_core::sc_signal<uint32_t>   		r_cyclecount;
-        sc_core::sc_signal<uint32_t>   		r_iterationcount;
+    sc_core::sc_signal<uint32_t>   		r_opa;
+    sc_core::sc_signal<uint32_t>   		r_opb;
+    sc_core::sc_signal<uint32_t>   		r_res;
+    sc_core::sc_signal<uint32_t>   		r_cyclecount;
+    sc_core::sc_signal<uint32_t>   		r_iterationcount;
 
 protected:
 	SC_HAS_PROCESS(FifoGcdMaster);

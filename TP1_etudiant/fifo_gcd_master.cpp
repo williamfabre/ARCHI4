@@ -38,19 +38,19 @@ namespace caba {
 //////////////////////////////////////////////////////
 FifoGcdMaster::FifoGcdMaster( sc_module_name insname, int seed )
 	: sc_module(insname),
-      	r_fsm("r_fsm"),
-      	r_opa("r_opa"),
-      	r_opb("r_opb"),
-      	r_res("r_res"),
+        r_fsm("r_fsm"),
+        r_opa("r_opa"),
+        r_opb("r_opb"),
+        r_res("r_res"),
         p_resetn("p_resetn"),
         p_clk("p_clk"),
         p_in("p_in"),
-	p_out("p_out")
+	    p_out("p_out")
 {
 	SC_METHOD(transition);
 	dont_initialize();
 	sensitive << p_clk.pos();
-	
+
 	SC_METHOD(genMoore);
 	dont_initialize();
 	sensitive << p_clk.neg();
@@ -75,8 +75,14 @@ void FifoGcdMaster::transition()
 	switch ( r_fsm.read() ) {
 	case RANDOM :
 		r_iterationcount = r_iterationcount.read() + 1;
+        // si tu fais juste +1, tu peux tomber sur FFFF et rotater sur les entiers
 		r_opa = rand();
 		r_opb = rand();
+        // Gestion du cas ou on a 0 sur une operandes
+        //while (r_opa == 0)
+            //r_opa = rand();
+        //while (r_opb == 0)
+            //r_opb = rand();
 		r_fsm = WRITE_OPA;
 		break;
 	case WRITE_OPA :
@@ -114,27 +120,27 @@ void FifoGcdMaster::transition()
 void FifoGcdMaster::genMoore()
 {
 	switch ( r_fsm.read() ) {
-	case RANDOM : 
+	case RANDOM :
         case DISPLAY :
-		p_in.r 		= false;
+		p_in.r		= false;
 		p_out.w		= false;
-                p_out.data	= 0;
-		break; 
+        p_out.data	= 0;
+		break;
 	case WRITE_OPA :
-		p_in.r 		= false;
+		p_in.r		= false;
 		p_out.w		= true;
-                p_out.data	= r_opa;
-		break; 
+        p_out.data	= r_opa;
+		break;
 	case WRITE_OPB :
-		p_in.r 		= false;
+		p_in.r		= false;
 		p_out.w		= true;
-                p_out.data	= r_opb;
-		break; 
+        p_out.data	= r_opb;
+		break;
 	case READ_RES :
-		p_in.r 		= true;
+		p_in.r		= true;
 		p_out.w		= false;
-                p_out.data	= 0;
-		break; 
+        p_out.data	= 0;
+		break;
      } // end switch
 } // end genMoore()
 
