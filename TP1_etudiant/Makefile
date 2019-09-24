@@ -17,23 +17,27 @@ fast_list=fast_fifo_gcd_master.o fast_fifo_gcd_coprocessor.o fast_tp1_top.o
 
 fast_simulator.x: $(fast_list)
 	$(CC) $(CFLAG) $(PERM) $(OPT) -L. $(LD_SCASS) -o $@ $^ -lsystemc -ldl 2>&1
+	echo $@:`date +%s` >> test.log
 fast_fifo_gcd_coprocessor.o : fifo_gcd_coprocessor.cpp
 	$(CC) $(CFLAG) $(PERM) $(CFLAG_OPT) -I. $(INC_SCASS) $(OPT) -c $< -o $@
 fast_fifo_gcd_master.o : fifo_gcd_master.cpp
 	$(CC) $(CFLAG) $(PERM) $(CFLAG_OPT) -I. $(INC_SCASS) $(OPT) -c $< -o $@
+	echo $@:`date +%s` >> test.log
 fast_tp1_top.o : tp1_top.cpp 
 	$(CC) $(CFLAG) $(PERM) $(CFLAG_OPT) -I. $(INC_SCASS) $(OPT) -c $< -o $@
 
 
 simulator.x: $(list)
-	$(CC) $(CFLAG) $(PERM) $(OPT) -L. $(LD) -o $@ $^ -lsystemc 2>&1
+	$(CC) $(CFLAG) $(OPT) -L. $(LD) -o $@ $^ -lsystemc 2>&1
+	echo $@:`date +%s` >> test.log
 fifo_gcd_coprocessor.o : fifo_gcd_coprocessor.cpp
-	$(CC) $(CFLAG) $(PERM) $(CFLAG_OPT) -I. $(INC) $(OPT) -c $<
+	$(CC) $(CFLAG) $(CFLAG_OPT) -I. $(INC) $(OPT) -c $<
 fifo_gcd_master.o : fifo_gcd_master.cpp
-	$(CC) $(CFLAG) $(PERM) $(CFLAG_OPT) -I. $(INC) $(OPT) -c $<
+	$(CC) $(CFLAG) $(CFLAG_OPT) -I. $(INC) $(OPT) -c $<
+	echo $@:`date +%s` >> test.log
 tp1_top.o : tp1_top.cpp 
-	$(CC) $(CFLAG) $(PERM) $(CFLAG_OPT) -I. $(INC) $(OPT) -c $<
+	$(CC) $(CFLAG) $(CFLAG_OPT) -I. $(INC) $(OPT) -c $<
 
 
 clean:
-	rm -f *.o *.bin core *~ simulator.x fast_simulator.x
+	rm -f *.o *.bin core *~ *.x *.log simulation.txt

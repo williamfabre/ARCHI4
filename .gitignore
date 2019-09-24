@@ -8,3 +8,7 @@
 *.x
 *.exe
 *.out
+
+#output unused
+simulation.txt
+*.log
