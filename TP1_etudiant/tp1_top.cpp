@@ -8,34 +8,34 @@
 
 int sc_main(int argc, char *argv[])
 {
-        using namespace sc_core;
+	using namespace sc_core;
 	using namespace soclib::caba;
 
 	/////////////////////////////////////////////////////////////////
 	// Arguments : number of cycles & seed for the random generation
 	/////////////////////////////////////////////////////////////////
 	int ncycles = std::numeric_limits<int>::max();
-        int seed    = 123456789;
+	int seed    = 123456789;
 	if (argc > 1) ncycles = atoi(argv[1]) ;
 	if (argc > 2) seed = atoi(argv[2]) ;
 
-	/////////////////////////////////////////////////////////////////
-        // Signals
-	/////////////////////////////////////////////////////////////////
-        sc_clock			signal_clk("signal_clk", sc_time( 1, SC_NS ), 0.5 );
-        sc_signal<bool>			signal_resetn("signal_resetn");
-        FifoSignals<uint32_t>		signal_fifo_m2c("signal_m2c");
-        FifoSignals<uint32_t>		signal_fifo_c2m("signal_c2m");
+	///////////////////////////////////////////////////////////////////
+        //// Signals
+	///////////////////////////////////////////////////////////////////
+	sc_clock			signal_clk("signal_clk", sc_time( 1, SC_NS ), 0.5 );
+	sc_signal<bool>			signal_resetn("signal_resetn");
+	FifoSignals<uint32_t>		signal_fifo_m2c("signal_m2c");
+	FifoSignals<uint32_t>		signal_fifo_c2m("signal_c2m");
 
-	/////////////////////////////////////////////////////////////////
-	// Components
-	/////////////////////////////////////////////////////////////////
-        FifoGcdMaster				master("master", seed);
+	///////////////////////////////////////////////////////////////////
+	//// Components
+	///////////////////////////////////////////////////////////////////
+	FifoGcdMaster				master("master", seed);
 	FifoGcdCoprocessor			coproc("coproc");
 
-	/////////////////////////////////////////////////////////////////
-	// Net-List
-	/////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////
+	//// Net-List
+	///////////////////////////////////////////////////////////////////
 	master.p_clk(signal_clk);
 	master.p_resetn(signal_resetn);
 	master.p_in(signal_fifo_c2m);
@@ -47,17 +47,18 @@ int sc_main(int argc, char *argv[])
 	coproc.p_out(signal_fifo_c2m);
 
 
-	/////////////////////////////////////////////////////////////////
-	// simulation
-	/////////////////////////////////////////////////////////////////
-	//sc_start(0); //
-	//sc_start( sc_time( 1, SC_NS ) ) ;
-	//sc_start( sc_time( 1, SC_NS ) ) ;
+	///////////////////////////////////////////////////////////////////
+	//// simulation
+	///////////////////////////////////////////////////////////////////
+	sc_start(0); 
+	////sc_start( sc_time( 1, SC_NS ) ) ; NE PAS METTRE ca sinon ca bug dans
+	// le fast_XXX on incremente le cycle de quelque chose qui n'a pas ete
+	// initialise je pense.
 
 	signal_resetn = false;
 
-	// gestion du cycle, cette fonction increment les cycles, execute un
-	// nouveau front d'horloge a chaque seconde : proc a 1 giga
+	//// gestion du cycle, cette fonction increment les cycles, execute un
+	//// nouveau front d'horloge a chaque seconde : proc a 1 giga
 	sc_start( sc_time( 1, SC_NS ) ) ;
 	signal_resetn = true;
 	for (size_t n=1 ; n<ncycles ; n++ )  sc_start( sc_time( 1, SC_NS ) ) ;
