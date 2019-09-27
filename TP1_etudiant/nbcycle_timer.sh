@@ -40,8 +40,8 @@ if [[ -f $simu ]]; then
 	echo -e "\033[32mTemps de compilation pour la version fast: \033[0m $fast_temps \033[32ms\033[0m"
 
 	# Temps d'execution
-	echo -e "\033[32mTemps d'execution du script simulator.x pour 1 000 000 de cycles: \033[0m $runtime_simu\033[32ms\033[0m"
-	echo -e "\033[32mTemps d'execution du script fast_simulator.x pour 1 000 000 de cycles: \033[0m $fast_runtime_simu\033[32ms\033[0m"
+	echo -e "\033[32mTemps d'execution du script simulator.x pour 10 000 000 de cycles: \033[0m $runtime_simu\033[32ms\033[0m"
+	echo -e "\033[32mTemps d'execution du script fast_simulator.x pour 10 000 000 de cycles: \033[0m $fast_runtime_simu\033[32ms\033[0m"
 else
 	echo -e "\033[31mVous devez compiler\033[0m"
 fi

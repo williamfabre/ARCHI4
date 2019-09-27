@@ -76,13 +76,9 @@ void FifoGcdMaster::transition()
 	case RANDOM :
 		r_iterationcount = r_iterationcount.read() + 1;
         // si tu fais juste +1, tu peux tomber sur FFFF et rotater sur les entiers
-		r_opa = rand();
-		r_opb = rand();
+		r_opa = (rand() % UINT32_MAX) + 1;
+		r_opb = (rand() % UINT32_MAX) + 1;
         // Gestion du cas ou on a 0 sur une operandes
-        //while (r_opa == 0)
-            //r_opa = rand();
-        //while (r_opb == 0)
-            //r_opb = rand();
 		r_fsm = WRITE_OPA;
 		break;
 	case WRITE_OPA :
