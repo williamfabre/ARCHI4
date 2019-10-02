@@ -7,7 +7,7 @@
 #include "vci_param.h"
 #include "mapping_table.h"
 
-#define GCD_BASE	0
+#define GCD_BASE	0x00000000
 #define GCD_SIZE	16
 
 int sc_main(int argc, char *argv[])
