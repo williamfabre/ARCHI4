@@ -31,6 +31,7 @@
 
 #include "gcd.h"
 #include "vci_gcd_coprocessor.h"
+#include "assert.h"
 
 using namespace sc_core;
 using namespace soclib::caba;
@@ -95,7 +96,7 @@ void VciGcdCoprocessor<vci_param>::transition()
     case EXE_COMPARE:
         if      ( r_opa.read() < r_opb.read() )	r_exe_fsm = EXE_DECB; // a< b
         else if ( r_opb.read() < r_opa.read() )	r_exe_fsm = EXE_DECA; // a> b
-        else r_exe_fsm = EXE_IDLE // case equal
+        else r_exe_fsm = EXE_IDLE; // case equal
             break;
     case EXE_DECA:
         // if( r_opa > r_opb ) opa = opa - opb
@@ -235,7 +236,7 @@ void VciGcdCoprocessor<vci_param>::genMoore()
 } // end genMoore()
 
 //template class VciGcdCoprocessor<soclib::caba::VciParams<>>;
-template class VciGcdCoprocessor<soclib::caba::VciParams<4, 8, 32, 1, 1, 1, 12, 1, 1, 1> >;
+template class VciGcdCoprocessor<soclib::caba::VciParams<4, 8, 32, 1, 1, 1, 12, 1, 1, 1>>;
 
 }}
 

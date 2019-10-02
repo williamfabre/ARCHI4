@@ -60,11 +60,11 @@ VciGcdMaster<vci_param>::VciGcdMaster(  sc_module_name insname,
         dont_initialize();
         sensitive << p_clk.pos(); // sensibilite sur front montant
 
-            SC_METHOD(genMoore);
+        SC_METHOD(genMoore);
         dont_initialize();
         sensitive << p_clk.neg(); // sensibilite sur front descendant
 
-            srand(seed);
+        srand(seed);
     }
 
 ////////////////////////////
@@ -77,12 +77,12 @@ VciGcdMaster<vci_param>::~VciGcdMaster( )
 template<typename vci_param>
 void VciGcdMaster<vci_param>::transition()
 {
-	if ( !p_resetn.read() ) {
-		r_fsm = RANDOM;
-		r_cycle = 0;
-		r_iter = 0;
-		return;
-	}
+    if ( !p_resetn.read() ) {
+        r_fsm = RANDOM;
+        r_cycle = 0;
+        r_iter = 0;
+        return;
+    }
 
 #ifdef SOCLIB_MODULE_DEBUG
     std::cout << "#################### cycle = " << r_cycle.read() << std::endl; 
@@ -90,79 +90,79 @@ void VciGcdMaster<vci_param>::transition()
     std::cout << name() << "  opa = " << r_opa.read() << std::endl;
     std::cout << name() << "  opb = " << r_opb.read() << std::endl;
 #endif
-  
-	switch ( r_fsm ) {
-	case RANDOM :
-		r_iter = r_iter.read() + 1;
-		r_opa = (rand() % UINT32_MAX) + 1;
-		r_opb = (rand() % UINT32_MAX) + 1; // On evite la valeur 0
-		r_fsm = CMD_OPA;
-		break;
-	case CMD_OPA :
-		if ( p_vci.cmdack.read() ) {
-			r_fsm = RSP_OPA;
-		}
-		break;
-	case RSP_OPA :
-		if ( p_vci.rspval.read() ) {
-			r_fsm = CMD_OPB;
-		}
-		break;
-	case CMD_OPB :
-		if ( p_vci.cmdack.read() ) {
-			r_fsm = RSP_OPB;
-		}
-		break;
-	case RSP_OPB :
-		if ( p_vci.rspval.read() ) {
-			r_fsm = CMD_START;
-		}
-		break;
-	case CMD_START :
-		if ( p_vci.cmdack.read() ) {
-			r_fsm = RSP_START;
-		}
-		break;
-	case RSP_START :
-		if ( p_vci.rspval.read() ) {
-			r_fsm = CMD_STATUS;
-		}
-		break;
-	case CMD_STATUS : // (1)
-		if ( p_vci.cmdack.read() ) {
-			r_fsm = RSP_STATUS;
-		}
-		break;
-	case RSP_STATUS :
-		if ( p_vci.rspval.read() ) { // il y a une reponse
-			if( p_vci.rdata.read() == 0 )	r_fsm = CMD_RESULT; // la reponse est bonne, on continue(2)
-			else				r_fsm = CMD_STATUS; // la reponse n'est pas bonne, on recommence(1)
-		}
-		break;
-	case CMD_RESULT : // (2)
-		if ( p_vci.cmdack.read() ) {
-			r_fsm = RSP_RESULT;
-		}
-		break;
-	case RSP_RESULT :
-		if ( p_vci.rspval.read() ) {
-			r_res = p_vci.rdata.read(); // on stocke la donnee du port vci dans un registre
-			r_fsm = DISPLAY;
-		}
-		break;
-	case DISPLAY :
-		r_fsm = RANDOM;
-		std::cout << std::dec << std::noshowbase;
-		std::cout << "*** " << name() << " *** iteration " << r_iter.read() << std::endl;
-		std::cout << "  cycle  = " << r_cycle.read() << std::endl;
-		std::cout << "  opa    = " << r_opa.read() << std::endl;
-		std::cout << "  opb    = " << r_opb.read() << std::endl;
-		std::cout << "  pgcd   = " << r_res.read() << std::endl;
-		break;
-        } // end switch
-	
-	// always increment cycle count 
-	r_cycle = r_cycle + 1;
+
+    switch ( r_fsm ) {
+    case RANDOM :
+        r_iter = r_iter.read() + 1;
+        r_opa = (rand() % UINT32_MAX) + 1;
+        r_opb = (rand() % UINT32_MAX) + 1; // On evite la valeur 0
+        r_fsm = CMD_OPA;
+        break;
+    case CMD_OPA :
+        if ( p_vci.cmdack.read() ) {
+            r_fsm = RSP_OPA;
+        }
+        break;
+    case RSP_OPA :
+        if ( p_vci.rspval.read() ) {
+            r_fsm = CMD_OPB;
+        }
+        break;
+    case CMD_OPB :
+        if ( p_vci.cmdack.read() ) {
+            r_fsm = RSP_OPB;
+        }
+        break;
+    case RSP_OPB :
+        if ( p_vci.rspval.read() ) {
+            r_fsm = CMD_START;
+        }
+        break;
+    case CMD_START :
+        if ( p_vci.cmdack.read() ) {
+            r_fsm = RSP_START;
+        }
+        break;
+    case RSP_START :
+        if ( p_vci.rspval.read() ) {
+            r_fsm = CMD_STATUS;
+        }
+        break;
+    case CMD_STATUS : // (1)
+        if ( p_vci.cmdack.read() ) {
+            r_fsm = RSP_STATUS;
+        }
+        break;
+    case RSP_STATUS :
+        if ( p_vci.rspval.read() ) { // il y a une reponse
+            if( p_vci.rdata.read() == 0 )	r_fsm = CMD_RESULT; // la reponse est bonne, on continue(2)
+            else				r_fsm = CMD_STATUS; // la reponse n'est pas bonne, on recommence(1)
+        }
+        break;
+    case CMD_RESULT : // (2)
+        if ( p_vci.cmdack.read() ) {
+            r_fsm = RSP_RESULT;
+        }
+        break;
+    case RSP_RESULT :
+        if ( p_vci.rspval.read() ) {
+            r_res = p_vci.rdata.read(); // on stocke la donnee du port vci dans un registre
+            r_fsm = DISPLAY;
+        }
+        break;
+    case DISPLAY :
+        r_fsm = RANDOM;
+        std::cout << std::dec << std::noshowbase;
+        std::cout << "*** " << name() << " *** iteration " << r_iter.read() << std::endl;
+        std::cout << "  cycle  = " << r_cycle.read() << std::endl;
+        std::cout << "  opa    = " << r_opa.read() << std::endl;
+        std::cout << "  opb    = " << r_opb.read() << std::endl;
+        std::cout << "  pgcd   = " << r_res.read() << std::endl;
+        break;
+    } // end switch
+
+    // always increment cycle count 
+    r_cycle = r_cycle + 1;
 
 } // end transition()
 
@@ -187,54 +187,55 @@ void VciGcdMaster<vci_param>::genMoore()
     case RANDOM : 
     case DISPLAY :
         p_vci.cmdval	= false;
-            p_vci.rspack	= true; // OK pour la derniere reponse
-            break; 
+        p_vci.rspack	= true; // OK pour la derniere reponse
+        break;
     case CMD_OPA :
         p_vci.cmdval	= true;
         p_vci.cmd	= vci_param::CMD_WRITE;
         p_vci.address	= m_base + 4*GCD_OPA;
         p_vci.wdata	= r_opa;
         p_vci.rspack	= false;
-        break; 
+        break;
     case CMD_OPB :
         p_vci.cmdval	= true;
-            p_vci.cmd	= vci_param::CMD_WRITE;
-            p_vci.address	= m_base + 4*GCD_OPB;   
-            p_vci.wdata	= r_opb;
-            p_vci.rspack	= false;
-            break; 
+        p_vci.cmd	= vci_param::CMD_WRITE;
+        p_vci.address	= m_base + 4*GCD_OPB;   
+        p_vci.wdata	= r_opb;
+        p_vci.rspack	= false;
+        break;
     case CMD_START :
-        p_vci.cmdval	= true
-            p_vci.cmd	= vci_param::CMD_WRITE;
-            p_vci.address	= m_base + 4*GCD_START; 
-            p_vci.wdata	= 0; // peu importe
-            p_vci.rspack	= false;
-            break; 
+        p_vci.cmdval	= true;
+        p_vci.cmd	= vci_param::CMD_WRITE;
+        p_vci.address	= m_base + 4*GCD_START; 
+        p_vci.wdata	= 0; // peu importe
+        p_vci.rspack	= false;
+        break;
     case CMD_RESULT :
         p_vci.cmdval	= true;
-            p_vci.cmd	= vci_param::CMD_READ;
-            p_vci.address	= m_base + 4*GCD_OPA; // resultat dans OPA
-            p_vci.wdata	= 0; // peu importe, lecture
-            p_vci.rspack	= false;
-            break; 
+        p_vci.cmd	= vci_param::CMD_READ;
+        p_vci.address	= m_base + 4*GCD_OPA; // resultat dans OPA
+        p_vci.wdata	= 0; // peu importe, lecture
+        p_vci.rspack	= false;
+        break;
     case CMD_STATUS :
         p_vci.cmdval	= true;
-            p_vci.cmd	= vci_param::CMD_READ;
-            p_vci.address	= m_base + 4*GCD_STATUS;
-            p_vci.wdata	= 0; // peu importe, lecture
-            p_vci.rspack	= false;
-            break; 
+        p_vci.cmd	= vci_param::CMD_READ;
+        p_vci.address	= m_base + 4*GCD_STATUS;
+        p_vci.wdata	= 0; // peu importe, lecture
+        p_vci.rspack	= false;
+        break;
     case RSP_OPA :
     case RSP_OPB :
     case RSP_START :
     case RSP_RESULT :
     case RSP_STATUS :
         p_vci.cmdval	= false;
-            p_vci.cmd	= CMD_NOP;
+        // p_vci.cmd	= vci_param::CMD_WRITE;
+        p_vci.cmd	= vci_param::CMD_NOP; // ne pas oublier la portee vci_param::
         p_vci.address	= 0; // peu importe, attente de reponse
-            p_vci.wdata	= 0; // peu importe, attente de reponse
-            p_vci.rspack	= true;
-            break; 
+        p_vci.wdata	= 0; // peu importe, attente de reponse
+        p_vci.rspack	= true;
+        break;
     } // end switch
 } // end genMoore()
 

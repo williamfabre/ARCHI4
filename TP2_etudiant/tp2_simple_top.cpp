@@ -7,12 +7,12 @@
 #include "vci_param.h"
 #include "mapping_table.h"
 
-#define GCD_BASE	TO BE COMPLETED...
-#define GCD_SIZE	TO BE COMPLETED...
-	
+#define GCD_BASE	0
+#define GCD_SIZE	16
+
 int sc_main(int argc, char *argv[])
 {
-        using namespace sc_core;
+	using namespace sc_core;
 	using namespace soclib::caba;
 	using namespace soclib::common;
 
@@ -28,15 +28,16 @@ int sc_main(int argc, char *argv[])
 	// 	pktid_size	= 1;
 	// 	wrplen_size	= 1;
 
-	typedef VciParams< TO BE COMPLETED > vci_param;
+	//typedef VciParams< TO BE COMPLETED > vci_param;
+	typedef VciParams<4, 8, 32, 1, 1, 1, 12, 1, 1, 1> vci_param;
 
 	///////////////////////////////////////////////////////////////////////////
 	// simulation arguments : number of cycles & seed for the random generation
 	///////////////////////////////////////////////////////////////////////////
-        int ncycles = std::numeric_limits<int>::max();
-        int seed    = 123456789;
-        if (argc > 1) ncycles = atoi(argv[1]) ;
-        if (argc > 2) seed = atoi(argv[2]) ;
+	int ncycles = std::numeric_limits<int>::max();
+	int seed    = 123456789;
+	if (argc > 1) ncycles = atoi(argv[1]) ;
+	if (argc > 2) seed = atoi(argv[2]) ;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Mapping Table
@@ -46,21 +47,36 @@ int sc_main(int argc, char *argv[])
 	std::cout << std::endl << maptab << std::endl;
 
 	//////////////////////////////////////////////////////////////////////////
-        // Signals
+	// Signals
 	//////////////////////////////////////////////////////////////////////////
-        sc_clock               		signal_clk("signal_clk", sc_time( 1, SC_NS ), 0.5 );
-        sc_signal<bool> 		signal_resetn("signal_resetn");
-        VciSignals<vci_param> 		signal_vci("signal_vci");
+	sc_clock               		signal_clk("signal_clk", sc_time( 1, SC_NS ), 0.5 );
+	sc_signal<bool> 		signal_resetn("signal_resetn");
+	VciSignals<vci_param> 		signal_vci("signal_vci");
 
-	//////////////////////////////////////////////////////////////////////////
-	// Components
-	//////////////////////////////////////////////////////////////////////////
-        VciGcdMaster<vci_param> 	master(TO BE COMPLETED);
-	VciGcdCoprocessor<vci_param>	coproc(TO BE COMPLETED);
+	////////////////////////////////////////////////////////////////////////////
+	//// Components
+	////////////////////////////////////////////////////////////////////////////
+	//[>(VciGcdMaster<vci_param>::VciGcdMaster(  sc_module_name insname,
+                                        //const soclib::common::IntTab &index,
+                                        //const soclib::common::MappingTable &mt,
+                                        //const int seed,
+                                        //const typename vci_param::addr_t base) */
+	VciGcdMaster<vci_param>		master("master",
+					       IntTab(0),
+					       maptab,
+					       seed,
+					       GCD_BASE);
 
-	//////////////////////////////////////////////////////////////////////////
-	// Net-List
-	//////////////////////////////////////////////////////////////////////////
+	//[> VciGcdCoprocessor<vci_param>::VciGcdCoprocessor(sc_module_name insname,
+                                                //const soclib::common::IntTab &index,
+                                                //const soclib::common::MappingTable &mt) */
+	VciGcdCoprocessor<vci_param>	coproc("coproc",
+					       IntTab(0),
+					       maptab);
+
+	////////////////////////////////////////////////////////////////////////////
+	//// Net-List
+	////////////////////////////////////////////////////////////////////////////
 	master.p_clk(signal_clk);
 	master.p_resetn(signal_resetn);
 	master.p_vci(signal_vci);
@@ -69,16 +85,17 @@ int sc_main(int argc, char *argv[])
 	coproc.p_resetn(signal_resetn);
 	coproc.p_vci(signal_vci);
 
-	//////////////////////////////////////////////////////////////////////////
-	// simulation
-	//////////////////////////////////////////////////////////////////////////
-        signal_resetn = false;
-        sc_start( sc_time( 1, SC_NS ) ) ;
+	////////////////////////////////////////////////////////////////////////////
+	//// simulation
+	////////////////////////////////////////////////////////////////////////////
+	sc_start(0); // il manquait cette ligne
+	signal_resetn = false;
+	sc_start( sc_time( 1, SC_NS ) ) ;
 
-        signal_resetn = true;
-        for ( size_t n=1 ; n<ncycles ; n++) sc_start( sc_time( 1, SC_NS ) ) ;
+	signal_resetn = true;
+	for ( size_t n=1 ; n<ncycles ; n++) sc_start( sc_time( 1, SC_NS ) ) ;
 
-        return(0);
+	return(0);
 
 } // end sc_main
 
