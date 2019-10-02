@@ -40,6 +40,7 @@ namespace soclib { namespace caba {
 ////////////////////////////
 template<typename vci_param>
 VciGcdMaster<vci_param>::VciGcdMaster(  sc_module_name insname,
+<<<<<<< HEAD
 					const soclib::common::IntTab &index,
 					const soclib::common::MappingTable &mt,
 					const int seed,
@@ -66,6 +67,34 @@ VciGcdMaster<vci_param>::VciGcdMaster(  sc_module_name insname,
 
 	srand(seed);
 }
+=======
+                                        const soclib::common::IntTab &index,
+                                        const soclib::common::MappingTable &mt,
+                                        const int seed,
+                                        const typename vci_param::addr_t base)
+: sc_module(insname),
+    r_fsm("r_fsm"),
+    r_opa("r_opa"),
+    r_opb("r_opb"),
+    r_res("r_res"),
+    r_cycle("r_cycle"),
+    m_srcid(mt.indexForId(index)),
+    m_base(base),
+    p_resetn("p_resetn"),
+    p_clk("p_clk"),
+    p_vci("p_vci")
+    {
+        SC_METHOD(transition);
+        dont_initialize();
+        sensitive << p_clk.pos(); // sensibilite sur front montant
+
+            SC_METHOD(genMoore);
+        dont_initialize();
+        sensitive << p_clk.neg(); // sensibilite sur front descendant
+
+            srand(seed);
+    }
+>>>>>>> 1b34068325c55996e5e07939af10a4a76e288a10
 
 ////////////////////////////
 template<typename vci_param>
@@ -85,10 +114,10 @@ void VciGcdMaster<vci_param>::transition()
 	}
 
 #ifdef SOCLIB_MODULE_DEBUG
-std::cout << "#################### cycle = " << r_cycle.read() << std::endl; 
-std::cout << name() << "  fsm = " << r_fsm.read() << std::endl;
-std::cout << name() << "  opa = " << r_opa.read() << std::endl;
-std::cout << name() << "  opb = " << r_opb.read() << std::endl;
+    std::cout << "#################### cycle = " << r_cycle.read() << std::endl; 
+    std::cout << name() << "  fsm = " << r_fsm.read() << std::endl;
+    std::cout << name() << "  opa = " << r_opa.read() << std::endl;
+    std::cout << name() << "  opb = " << r_opb.read() << std::endl;
 #endif
   
 	switch ( r_fsm ) {
@@ -146,7 +175,7 @@ std::cout << name() << "  opb = " << r_opb.read() << std::endl;
 		break;
 	case RSP_RESULT :
 		if ( p_vci.rspval.read() ) {
-			r_res = p_vci.rdata; // on stocke la donnee du port vci dans un registre
+			r_res = p_vci.rdata.read(); // on stocke la donnee du port vci dans un registre
 			r_fsm = DISPLAY;
 		}
 		break;
@@ -170,72 +199,72 @@ std::cout << name() << "  opb = " << r_opb.read() << std::endl;
 template<typename vci_param>
 void VciGcdMaster<vci_param>::genMoore()
 {
-	// contant VCI command fields
-	p_vci.be 	= A COMPLETER 	// no masking
-	p_vci.plen	= A COMPLETER	// all transactions are single flit
-	p_vci.eop	= A COMPLETER	// all transactions are single flit
-	p_vci.srcid	= A COMPLETER	// initiator ID
-	p_vci.trdid	= 0;		// unused
-	p_vci.pktid	= 0;		// unused
-	p_vci.contig	= true;		// unused
-	p_vci.cons	= false;	// unused
-	p_vci.wrap	= false;	// unused
-	p_vci.cfixed	= false;	// unused
-	p_vci.clen	= 0;		// unused
-	
-	switch ( r_fsm.read() ) {
-	case RANDOM : 
-        case DISPLAY :
-		p_vci.cmdval	= A COMPLETER
-		p_vci.rspack	= A COMPLETER
-		break; 
-	case CMD_OPA :
-		p_vci.cmdval	= true;
-		p_vci.cmd	= vci_param::CMD_WRITE;
-		p_vci.address	= m_base + 4*GCD_OPA;
-		p_vci.wdata	= r_opa;
-		p_vci.rspack	= false;
-		break; 
-	case CMD_OPB :
-		p_vci.cmdval	= A COMPLETER
-		p_vci.cmd	= A COMPLETER
-		p_vci.address	= A COMPLETER
-		p_vci.wdata	= A COMPLETER
-		p_vci.rspack	= A COMPLETER
-		break; 
-	case CMD_START :
-		p_vci.cmdval	= A COMPLETER
-		p_vci.cmd	= A COMPLETER
-		p_vci.address	= A COMPLETER
-		p_vci.wdata	= A COMPLETER
-		p_vci.rspack	= A COMPLETER
-		break; 
-	case CMD_RESULT :
-		p_vci.cmdval	= A COMPLETER
-		p_vci.cmd	= A COMPLETER
-		p_vci.address	= A COMPLETER
-		p_vci.wdata	= A COMPLETER
-		p_vci.rspack	= A COMPLETER
-		break; 
-	case CMD_STATUS :
-		p_vci.cmdval	= A COMPLETER
-		p_vci.cmd	= A COMPLETER
-		p_vci.address	= A COMPLETER
-		p_vci.wdata	= A COMPLETER
-		p_vci.rspack	= A COMPLETER
-		break; 
-	case RSP_OPA :
-	case RSP_OPB :
-	case RSP_START :
-	case RSP_RESULT :
-	case RSP_STATUS :
-		p_vci.cmdval	= A COMPLETER
-		p_vci.cmd	= A COMPLETER;
-		p_vci.address	= A COMPLETER
-		p_vci.wdata	= A COMPLETER
-		p_vci.rspack	= A COMPLETER
-		break; 
-     } // end switch
+    // contant VCI command fields
+    p_vci.be   = A COMPLETER 	// no masking
+    p_vci.plen = A COMPLETER	// all transactions are single flit
+    p_vci.eop  = A COMPLETER	// all transactions are single flit
+    p_vci.srcid	= A COMPLETER	// initiator ID
+    p_vci.trdid	= 0;		// unused
+    p_vci.pktid	= 0;		// unused
+    p_vci.contig= true;		// unused
+    p_vci.cons	= false;	// unused
+    p_vci.wrap	= false;	// unused
+    p_vci.cfixed = false;	// unused
+    p_vci.clen	= 0;		// unused
+
+    switch ( r_fsm.read() ) {
+    case RANDOM : 
+    case DISPLAY :
+        p_vci.cmdval	= A COMPLETER
+            p_vci.rspack	= A COMPLETER
+            break; 
+    case CMD_OPA :
+        p_vci.cmdval	= true;
+        p_vci.cmd	= vci_param::CMD_WRITE;
+        p_vci.address	= m_base + 4*GCD_OPA;
+        p_vci.wdata	= r_opa;
+        p_vci.rspack	= false;
+        break; 
+    case CMD_OPB :
+        p_vci.cmdval	= A COMPLETER
+            p_vci.cmd	= A COMPLETER
+            p_vci.address	= A COMPLETER
+            p_vci.wdata	= A COMPLETER
+            p_vci.rspack	= A COMPLETER
+            break; 
+    case CMD_START :
+        p_vci.cmdval	= A COMPLETER
+            p_vci.cmd	= A COMPLETER
+            p_vci.address	= A COMPLETER
+            p_vci.wdata	= A COMPLETER
+            p_vci.rspack	= A COMPLETER
+            break; 
+    case CMD_RESULT :
+        p_vci.cmdval	= A COMPLETER
+            p_vci.cmd	= A COMPLETER
+            p_vci.address	= A COMPLETER
+            p_vci.wdata	= A COMPLETER
+            p_vci.rspack	= A COMPLETER
+            break; 
+    case CMD_STATUS :
+        p_vci.cmdval	= A COMPLETER
+            p_vci.cmd	= A COMPLETER
+            p_vci.address	= A COMPLETER
+            p_vci.wdata	= A COMPLETER
+            p_vci.rspack	= A COMPLETER
+            break; 
+    case RSP_OPA :
+    case RSP_OPB :
+    case RSP_START :
+    case RSP_RESULT :
+    case RSP_STATUS :
+        p_vci.cmdval	= A COMPLETER
+            p_vci.cmd	= A COMPLETER;
+        p_vci.address	= A COMPLETER
+            p_vci.wdata	= A COMPLETER
+            p_vci.rspack	= A COMPLETER
+            break; 
+    } // end switch
 } // end genMoore()
 
 template class VciGcdMaster<soclib::caba::VciParams<A COMPLETER>;
