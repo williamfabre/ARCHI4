@@ -192,11 +192,11 @@ void VciGcdCoprocessor<vci_param>::genMoore()
     p_vci("vci")-> TODO
     */
 
-    // sorties indépendantes de l'état de l'automate de MOORE donc on recopie
+    // sorties indï¿½pendantes de l'ï¿½tat de l'automate de MOORE donc on recopie
     // juste les registres (ne dpd pas de l'entree)
-    p_vci.rsrcid = r_srcid;
-    p_vci.rtrdid = r_trdid;
-    p_vci.rpktid = r_pktid;
+    p_vci.rsrcid = 0;
+    p_vci.rtrdid = 0;
+    p_vci.rpktid = 0; // Comportement specialise, pas besoin de threads
     p_vci.rerror = 0;
     p_vci.reop   = true; // end of packet
 
