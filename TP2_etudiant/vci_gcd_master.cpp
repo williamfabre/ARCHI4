@@ -40,34 +40,6 @@ namespace soclib { namespace caba {
 ////////////////////////////
 template<typename vci_param>
 VciGcdMaster<vci_param>::VciGcdMaster(  sc_module_name insname,
-<<<<<<< HEAD
-					const soclib::common::IntTab &index,
-					const soclib::common::MappingTable &mt,
-					const int seed,
-					const typename vci_param::addr_t base)
-      : sc_module(insname),
-      	r_fsm("r_fsm"),
-      	r_opa("r_opa"),
-      	r_opb("r_opb"),
-      	r_res("r_res"),
-	r_cycle("r_cycle"),
-	m_srcid(mt.indexForId(index)),
-	m_base(base),
-        p_resetn("p_resetn"),
-        p_clk("p_clk"),
-        p_vci("p_vci")
-{
-	SC_METHOD(transition);
-	dont_initialize();
-	sensitive << p_clk.pos();
-	
-	SC_METHOD(genMoore);
-	dont_initialize();
-	sensitive << p_clk.neg();
-
-	srand(seed);
-}
-=======
                                         const soclib::common::IntTab &index,
                                         const soclib::common::MappingTable &mt,
                                         const int seed,
@@ -94,7 +66,6 @@ VciGcdMaster<vci_param>::VciGcdMaster(  sc_module_name insname,
 
             srand(seed);
     }
->>>>>>> 1b34068325c55996e5e07939af10a4a76e288a10
 
 ////////////////////////////
 template<typename vci_param>
