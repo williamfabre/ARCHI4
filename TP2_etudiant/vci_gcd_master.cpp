@@ -94,8 +94,8 @@ void VciGcdMaster<vci_param>::transition()
     switch ( r_fsm ) {
     case RANDOM :
         r_iter = r_iter.read() + 1;
-        r_opa = (rand() % UINT32_MAX) + 1;
-        r_opb = (rand() % UINT32_MAX) + 1; // On evite la valeur 0
+        r_opa = (rand() % 100) + 1;
+        r_opb = (rand() % 101) + 1; // On evite la valeur 0
         r_fsm = CMD_OPA;
         break;
     case CMD_OPA :
@@ -136,7 +136,7 @@ void VciGcdMaster<vci_param>::transition()
     case RSP_STATUS :
         if ( p_vci.rspval.read() ) { // il y a une reponse
             if( p_vci.rdata.read() == 0 )	r_fsm = CMD_RESULT; // la reponse est bonne, on continue(2)
-            else				r_fsm = CMD_STATUS; // la reponse n'est pas bonne, on recommence(1)
+            else				            r_fsm = CMD_STATUS; // la reponse n'est pas bonne, on recommence(1)
         }
         break;
     case CMD_RESULT : // (2)
@@ -184,44 +184,44 @@ void VciGcdMaster<vci_param>::genMoore()
     p_vci.clen	= 0;		// unused
 
     switch ( r_fsm.read() ) {
-    case RANDOM : 
+    case RANDOM :
     case DISPLAY :
         p_vci.cmdval	= false;
         p_vci.rspack	= true; // OK pour la derniere reponse
         break;
     case CMD_OPA :
         p_vci.cmdval	= true;
-        p_vci.cmd	= vci_param::CMD_WRITE;
+        p_vci.cmd	    = vci_param::CMD_WRITE;
         p_vci.address	= m_base + 4*GCD_OPA;
-        p_vci.wdata	= r_opa;
+        p_vci.wdata	    = r_opa;
         p_vci.rspack	= false;
         break;
     case CMD_OPB :
         p_vci.cmdval	= true;
-        p_vci.cmd	= vci_param::CMD_WRITE;
-        p_vci.address	= m_base + 4*GCD_OPB;   
-        p_vci.wdata	= r_opb;
+        p_vci.cmd	    = vci_param::CMD_WRITE;
+        p_vci.address	= m_base + 4*GCD_OPB;
+        p_vci.wdata	    = r_opb;
         p_vci.rspack	= false;
         break;
     case CMD_START :
         p_vci.cmdval	= true;
-        p_vci.cmd	= vci_param::CMD_WRITE;
-        p_vci.address	= m_base + 4*GCD_START; 
-        p_vci.wdata	= 0; // peu importe
+        p_vci.cmd	    = vci_param::CMD_WRITE;
+        p_vci.address	= m_base + 4*GCD_START;
+        p_vci.wdata	    = 0; // peu importe
         p_vci.rspack	= false;
         break;
     case CMD_RESULT :
         p_vci.cmdval	= true;
-        p_vci.cmd	= vci_param::CMD_READ;
+        p_vci.cmd	    = vci_param::CMD_READ;
         p_vci.address	= m_base + 4*GCD_OPA; // resultat dans OPA
-        p_vci.wdata	= 0; // peu importe, lecture
+        p_vci.wdata	    = 0; // peu importe, lecture
         p_vci.rspack	= false;
         break;
     case CMD_STATUS :
         p_vci.cmdval	= true;
-        p_vci.cmd	= vci_param::CMD_READ;
+        p_vci.cmd	    = vci_param::CMD_READ;
         p_vci.address	= m_base + 4*GCD_STATUS;
-        p_vci.wdata	= 0; // peu importe, lecture
+        p_vci.wdata	    = 0; // peu importe, lecture
         p_vci.rspack	= false;
         break;
     case RSP_OPA :
@@ -231,9 +231,9 @@ void VciGcdMaster<vci_param>::genMoore()
     case RSP_STATUS :
         p_vci.cmdval	= false;
         // p_vci.cmd	= vci_param::CMD_WRITE;
-        p_vci.cmd	= vci_param::CMD_NOP; // ne pas oublier la portee vci_param::
+        p_vci.cmd	    = vci_param::CMD_NOP; // ne pas oublier la portee vci_param::
         p_vci.address	= 0; // peu importe, attente de reponse
-        p_vci.wdata	= 0; // peu importe, attente de reponse
+        p_vci.wdata	    = 0; // peu importe, attente de reponse
         p_vci.rspack	= true;
         break;
     } // end switch

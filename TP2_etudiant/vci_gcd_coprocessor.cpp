@@ -156,7 +156,7 @@ void VciGcdCoprocessor<vci_param>::transition()
 
             } else if ( ( p_vci.cmd.read() == vci_param::CMD_WRITE )
                         && ( cell == GCD_START ) ) {
-                    r_vci_fsm = VCI_RSP_RESULT; // calcule du pgcd avec les commandes
+                    r_vci_fsm = VCI_RSP_START; // calcule du pgcd avec les commandes
                     // sur opa et opb
 
             } else {
@@ -199,7 +199,7 @@ void VciGcdCoprocessor<vci_param>::genMoore()
     p_vci.rtrdid = r_trdid;
     p_vci.rpktid = r_pktid; // Comportement specialise, pas besoin de threads
     p_vci.rerror = 0;
-    p_vci.reop   = true; // end of packet
+    p_vci.reop   = 1; // end of packet
 
     switch (r_vci_fsm) {
     case VCI_GET_CMD:
