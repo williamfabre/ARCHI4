@@ -38,6 +38,7 @@ namespace soclib { namespace caba {
 ////////////////////////////
 template<typename vci_param>
 VciVgsb<vci_param>::VciVgsb (	sc_module_name 		name,
+<<<<<<< HEAD
                                 MappingTable 		&maptab,
                                 size_t 			nb_master,
                                 size_t 			nb_slave)
@@ -84,6 +85,54 @@ VciVgsb<vci_param>::VciVgsb (	sc_module_name 		name,
             exit(0);
         }
     } // end constructor
+=======
+                        	MappingTable 		&maptab,
+                        	size_t 			nb_master,
+                        	size_t 			nb_slave)
+    : sc_core::sc_module(name),
+      m_routing_table(maptab.getRoutingTable( IntTab() ) ),
+      m_nb_initiator(nb_master),
+      m_nb_target(nb_slave),
+      p_clk("clk"),
+      p_resetn("resetn"),
+      p_to_initiator(soclib::common::alloc_elems<soclib::caba::VciTarget<vci_param> >("p_to_initiator", nb_master)),
+      p_to_target(soclib::common::alloc_elems<soclib::caba::VciInitiator<vci_param> >("p_to_target", nb_slave)),
+      r_fsm("r_fsm"),
+      r_initiator_index("r_initiator_index"),
+      r_target_index("r_target_index"),
+      r_vci_counter(soclib::common::alloc_elems<sc_signal<uint32_t> >("r_vci_counter", nb_master, nb_slave))
+{
+	SC_METHOD(transition);
+	dont_initialize();
+	sensitive << p_clk.pos();
+
+	SC_METHOD(genMealy_rspval);
+	dont_initialize();
+	sensitive << p_clk.neg();
+	for ( size_t i=0 ; i<nb_slave  ; i++ ) sensitive << p_to_target[i];
+
+	SC_METHOD(genMealy_rspack);
+	dont_initialize();
+	sensitive << p_clk.neg();
+	for ( size_t i=0 ; i<nb_master ; i++ ) sensitive << p_to_initiator[i];
+
+	SC_METHOD(genMealy_cmdval);
+	dont_initialize();
+	sensitive << p_clk.neg();
+	for ( size_t i=0 ; i<nb_master ; i++ ) sensitive << p_to_initiator[i];
+
+	SC_METHOD(genMealy_cmdack);
+	dont_initialize();
+	sensitive << p_clk.neg();
+	for ( size_t i=0 ; i<nb_slave  ; i++ ) sensitive << p_to_target[i];
+
+	if ( !m_routing_table.isAllBelow( nb_slave ) ) {
+		std::cout << "error in vci_gsb component" << std::endl;
+		std::cout << "one target index is larger than the number of targets" << std::endl;
+		exit(0);
+	}
+} // end constructor
+>>>>>>> 28e2f698f246da33bc11ff605bb6094380784150
 
 ////////////////////////////
 template<typename vci_param>
@@ -104,13 +153,18 @@ void VciVgsb<vci_param>::transition()
         r_target_index = 0;
         for(size_t i=0 ; i<(m_nb_initiator) ; i++) {
             for(size_t j=0 ; j<(m_nb_target) ; j++) { 
+<<<<<<< HEAD
                 r_vci_counter[i][j] = 0; 
+=======
+		r_vci_counter[i][j] = 0; 
+>>>>>>> 28e2f698f246da33bc11ff605bb6094380784150
             }
         }
         return;
     } 
 
 #ifdef TP2_DEBUG
+<<<<<<< HEAD
     std::cout << "vgsb fsm = " << r_fsm.read() << std::endl;
     std::cout << "vgsb ini = " << r_initiator_index.read() << std::endl;
     std::cout << "vgsb tgt = " << r_target_index.read() << std::endl;
@@ -118,6 +172,15 @@ void VciVgsb<vci_param>::transition()
 
     switch( r_fsm.read() ) {
     case FSM_IDLE:
+=======
+std::cout << "vgsb fsm = " << r_fsm.read() << std::endl;
+std::cout << "vgsb ini = " << r_initiator_index.read() << std::endl;
+std::cout << "vgsb tgt = " << r_target_index.read() << std::endl;
+#endif
+
+    switch( r_fsm.read() ) {
+	case FSM_IDLE:
+>>>>>>> 28e2f698f246da33bc11ff605bb6094380784150
         for (size_t x = 0 ; x < m_nb_initiator ; x++) {
             size_t ini = ( x + 1 + r_initiator_index.read() ) % m_nb_initiator;
             if( p_to_initiator[ini].cmdval.read() ) {
@@ -131,17 +194,29 @@ void VciVgsb<vci_param>::transition()
         } // end for
         break;
 
+<<<<<<< HEAD
     case FSM_CMD:
+=======
+	case FSM_CMD:
+>>>>>>> 28e2f698f246da33bc11ff605bb6094380784150
         if ( p_to_initiator[r_initiator_index.read()].eop.read() && 
              p_to_initiator[r_initiator_index.read()].cmdval.read() && 
              p_to_target[r_target_index.read()].cmdack.read() ) r_fsm = FSM_RSP;  
         break;
 
+<<<<<<< HEAD
     case FSM_RSP:
         if ( p_to_target[r_target_index.read()].reop && 
              p_to_target[r_target_index.read()].rspval && 
              p_to_initiator[r_initiator_index.read()].rspack ) { 
             for (size_t x = 0 ; x < m_nb_initiator ; x++) {
+=======
+	case FSM_RSP:
+        if ( p_to_target[r_target_index.read()].reop && 
+             p_to_target[r_target_index.read()].rspval && 
+             p_to_initiator[r_initiator_index.read()].rspack ) { 
+	     for (size_t x = 0 ; x < m_nb_initiator ; x++) {
+>>>>>>> 28e2f698f246da33bc11ff605bb6094380784150
                 size_t ini = ( x + 1 + r_initiator_index.read() ) % m_nb_initiator;
                 if( p_to_initiator[ini].cmdval.read() ) {
                     size_t tgt = m_routing_table[p_to_initiator[ini].address.read()];
@@ -168,7 +243,11 @@ void VciVgsb<vci_param>::genMealy_cmdval()
 
     if ( r_fsm.read() == FSM_CMD ) {	// cmd packet transfer
         for (size_t x = 0 ; x<m_nb_target ; x++) {
+<<<<<<< HEAD
             if ( x == tgt ) {
+=======
+	    if ( x == tgt ) {
+>>>>>>> 28e2f698f246da33bc11ff605bb6094380784150
                 p_to_target[x].cmdval  = p_to_initiator[ini].cmdval.read();
                 p_to_target[x].wdata   = p_to_initiator[ini].wdata.read();
                 p_to_target[x].address = p_to_initiator[ini].address.read();
@@ -200,7 +279,11 @@ void VciVgsb<vci_param>::genMealy_cmdack()
 
     if ( r_fsm.read() == FSM_CMD ) {   // cmd packet transfer
         for (size_t x = 0 ; x<m_nb_initiator ; x++) {
+<<<<<<< HEAD
             if ( x == ini ) {
+=======
+	    if ( x == ini ) {
+>>>>>>> 28e2f698f246da33bc11ff605bb6094380784150
                 p_to_initiator[x].cmdack = p_to_target[tgt].cmdack.read();
             } else {
                 p_to_initiator[x].cmdack = false;
@@ -209,7 +292,11 @@ void VciVgsb<vci_param>::genMealy_cmdack()
     } else {				// no cmd packet transfer
         for (size_t x = 0 ; x<m_nb_initiator ; x++) {
             p_to_initiator[x].cmdack = false;
+<<<<<<< HEAD
         }
+=======
+	}
+>>>>>>> 28e2f698f246da33bc11ff605bb6094380784150
     }
 } // end genMealy_cmdack()
 
@@ -222,7 +309,11 @@ void VciVgsb<vci_param>::genMealy_rspval()
 
     if ( r_fsm.read() == FSM_RSP ) {	// response packet transfer
         for (size_t x = 0 ; x<m_nb_initiator ; x++) {
+<<<<<<< HEAD
             if ( x == ini ) {
+=======
+	    if ( x == ini ) {
+>>>>>>> 28e2f698f246da33bc11ff605bb6094380784150
                 p_to_initiator[x].rspval = p_to_target[tgt].rspval.read();
                 p_to_initiator[x].rdata  = p_to_target[tgt].rdata.read();
                 p_to_initiator[x].rerror = p_to_target[tgt].rerror.read();

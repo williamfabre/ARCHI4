@@ -228,7 +228,13 @@ public:
         rspval = false;
     }
 
+<<<<<<< HEAD
     friend sc_core::sc_sensitive &operator <<( sc_core::sc_sensitive &ss, VciTarget<vci_param> &sig )
+=======
+    friend sc_core::sc_sensitive &operator <<(
+        sc_core::sc_sensitive &ss,
+        VciTarget<vci_param> &sig )
+>>>>>>> 28e2f698f246da33bc11ff605bb6094380784150
     {
         ss << sig.rspack
            << sig.cmdval

@@ -43,6 +43,7 @@ using namespace sc_core;
 /////////////////////////////
 template<typename vci_param>
 class VciGcdCoprocessor
+<<<<<<< HEAD
 : public sc_core::sc_module
 {
     enum gcd_coproc_vci_fsm_state_e {
@@ -90,6 +91,55 @@ private:
     // member functions
     void transition();
     void genMoore();
+=======
+	: public sc_core::sc_module
+{
+	enum gcd_coproc_vci_fsm_state_e {
+		VCI_GET_CMD,
+		VCI_RSP_OPA,
+		VCI_RSP_OPB,
+		VCI_RSP_START,
+		VCI_RSP_STATUS,
+		VCI_RSP_RESULT,
+	};
+	enum gcd_coproc_exe_fsm_state_e {
+		EXE_IDLE,
+		EXE_COMPARE,
+		EXE_DECA,
+		EXE_DECB,
+	};
+
+	// Registers
+	sc_core::sc_signal<int>					r_vci_fsm;
+	sc_core::sc_signal<int>					r_exe_fsm;
+        sc_core::sc_signal<typename vci_param::srcid_t> 	r_srcid;
+        sc_core::sc_signal<typename vci_param::trdid_t> 	r_trdid;
+        sc_core::sc_signal<typename vci_param::pktid_t> 	r_pktid;
+        sc_core::sc_signal<typename vci_param::data_t>   	r_opa;
+        sc_core::sc_signal<typename vci_param::data_t>   	r_opb;
+
+	soclib::common::Segment 				m_segment;
+
+protected:
+	SC_HAS_PROCESS(VciGcdCoprocessor);
+
+public:
+	// ports
+        sc_core::sc_in<bool> 					p_resetn;
+        sc_core::sc_in<bool> 					p_clk;
+        soclib::caba::VciTarget<vci_param> 			p_vci;
+
+	// constructor & destructor
+	VciGcdCoprocessor( 	sc_core::sc_module_name insname,
+        			const soclib::common::IntTab &index,
+        			const soclib::common::MappingTable &mt);
+	~VciGcdCoprocessor();
+
+private:
+	// member functions
+	void transition();
+	void genMoore();
+>>>>>>> 28e2f698f246da33bc11ff605bb6094380784150
 
 }; // end class VciGcdCoprocessor
 
