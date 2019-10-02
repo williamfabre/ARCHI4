@@ -58,11 +58,11 @@ VciGcdMaster<vci_param>::VciGcdMaster(  sc_module_name insname,
 {
 	SC_METHOD(transition);
 	dont_initialize();
-	sensitive << A COMPLETER 
+	sensitive << p_clk.pos();
 	
 	SC_METHOD(genMoore);
 	dont_initialize();
-	sensitive << A COMPLETER
+	sensitive << p_clk.neg();
 
 	srand(seed);
 }
@@ -78,7 +78,7 @@ template<typename vci_param>
 void VciGcdMaster<vci_param>::transition()
 {
 	if ( !p_resetn.read() ) {
-		r_fsm = A COMPLETER
+		r_fsm = RANDOM;
 		r_cycle = 0;
 		r_iter = 0;
 		return;
@@ -94,64 +94,64 @@ std::cout << name() << "  opb = " << r_opb.read() << std::endl;
 	switch ( r_fsm ) {
 	case RANDOM :
 		r_iter = r_iter.read() + 1;
-		r_opa = A COMPLETER
-		r_opb = A COMPLETER
-		r_fsm = A COMPLETER
+		r_opa = (rand() % UINT32_MAX) + 1;
+		r_opb = (rand() % UINT32_MAX) + 1; // On evite la valeur 0
+		r_fsm = CMD_OPA;
 		break;
 	case CMD_OPA :
 		if ( p_vci.cmdack.read() ) {
-			r_fsm = A COMPLETER
+			r_fsm = RSP_OPA;
 		}
 		break;
 	case RSP_OPA :
 		if ( p_vci.rspval.read() ) {
-			r_fsm = A COMPLETER
+			r_fsm = CMD_OPB;
 		}
 		break;
 	case CMD_OPB :
 		if ( p_vci.cmdack.read() ) {
-			r_fsm = A COMPLETER
+			r_fsm = RSP_OPB;
 		}
 		break;
 	case RSP_OPB :
 		if ( p_vci.rspval.read() ) {
-			r_fsm = A COMPLETER
+			r_fsm = CMD_START;
 		}
 		break;
 	case CMD_START :
 		if ( p_vci.cmdack.read() ) {
-			r_fsm = A COMPLETER
+			r_fsm = RSP_START;
 		}
 		break;
 	case RSP_START :
 		if ( p_vci.rspval.read() ) {
-			r_fsm = A COMPLETER
+			r_fsm = CMD_STATUS;
 		}
 		break;
-	case CMD_STATUS :
+	case CMD_STATUS : // (1)
 		if ( p_vci.cmdack.read() ) {
-			r_fsm = A COMPLETER
+			r_fsm = RSP_STATUS;
 		}
 		break;
 	case RSP_STATUS :
-		if ( p_vci.rspval.read() ) {
-			if( p_vci.rdata.read() == 0 )	r_fsm = A COMPLETER
-			else				r_fsm = A COMPLETER
+		if ( p_vci.rspval.read() ) { // il y a une reponse
+			if( p_vci.rdata.read() == 0 )	r_fsm = CMD_RESULT; // la reponse est bonne, on continue(2)
+			else				r_fsm = CMD_STATUS; // la reponse n'est pas bonne, on recommence(1)
 		}
 		break;
-	case CMD_RESULT :
+	case CMD_RESULT : // (2)
 		if ( p_vci.cmdack.read() ) {
-			r_fsm = A COMPLETER
+			r_fsm = RSP_RESULT;
 		}
 		break;
 	case RSP_RESULT :
 		if ( p_vci.rspval.read() ) {
-			r_res = A COMPLETER
-			r_fsm = A COMPLETER
+			r_res = p_vci.rdata; // on stocke la donnee du port vci dans un registre
+			r_fsm = DISPLAY;
 		}
 		break;
 	case DISPLAY :
-		r_fsm = A COMPLETER
+		r_fsm = RANDOM;
 		std::cout << std::dec << std::noshowbase;
 		std::cout << "*** " << name() << " *** iteration " << r_iter.read() << std::endl;
 		std::cout << "  cycle  = " << r_cycle.read() << std::endl;
