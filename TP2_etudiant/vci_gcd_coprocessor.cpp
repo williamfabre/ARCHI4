@@ -194,7 +194,7 @@ void VciGcdCoprocessor<vci_param>::genMoore()
 
     // sorties ind�pendantes de l'�tat de l'automate de MOORE donc on recopie
     // juste les registres (ne dpd pas de l'entree)
-    p_vci.rsrcid = r_srcid	;
+    p_vci.rsrcid = r_srcid;
     p_vci.rtrdid = r_trdid;
     p_vci.rpktid = r_pktid; // Comportement specialise, pas besoin de threads
     p_vci.rerror = 0;
