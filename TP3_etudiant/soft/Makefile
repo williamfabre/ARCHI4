@@ -1,7 +1,7 @@
-LD= /opt/gcc-cross-mipsel/4.3.3/bin/mipsel-unknown-elf-ld
-CC= /opt/gcc-cross-mipsel/4.3.3/bin/mipsel-unknown-elf-gcc
-AS= /opt/gcc-cross-mipsel/4.3.3/bin/mipsel-unknown-elf-as
-DU= /opt/gcc-cross-mipsel/4.3.3/bin/mipsel-unknown-elf-objdump
+LD= /opt/gcc-cross-mipsel/8.2.0/bin/mipsel-unknown-elf-ld
+CC= /opt/gcc-cross-mipsel/8.2.0/bin/mipsel-unknown-elf-gcc
+AS= /opt/gcc-cross-mipsel/8.2.0/bin/mipsel-unknown-elf-as
+DU= /opt/gcc-cross-mipsel/8.2.0/bin/mipsel-unknown-elf-objdump
 
 SYS_OBJS=  reset.o \
 	   giet.o \
