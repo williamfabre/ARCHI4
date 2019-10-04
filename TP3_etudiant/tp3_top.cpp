@@ -165,7 +165,7 @@ int _main(int argc, char *argv[])
 	//////////////////////////////////////////////////////////////////////////
 	// Mapping Table
 	//////////////////////////////////////////////////////////////////////////
-	MappingTable maptab(TO BE COMPLETED);
+	MappingTable maptab(32, IntTab(8));
 
 	maptab.add(Segment("seg_reset", SEG_RESET_BASE, SEG_RESET_SIZE, IntTab(TGTID_ROM), TO BE COMPLETED));
 
