@@ -1,6 +1,6 @@
 #include "stdio.h"
 
-__attribute__((constructor)) void  main()
+__attribute__((constructor)) void  main() // ecrit hello world puis attend un caractere en boucle
 {
 	char  byte;
 
