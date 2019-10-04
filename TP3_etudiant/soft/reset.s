@@ -35,9 +35,10 @@ reset:
        	mtc0	$26,	$12		# SR <= user mode / IRQ enable (after eret)
 
 # jumps to main 
-        la      TO BE COMPLETED         # $26 <= seg_data_base
-        lw      TO BE COMPLETED         # $26 <= M[seg_data_base]
-        mtc0    TO BE COMPLETED         # EPC <= $26  (EPC == $14)
+        la      $26, seg_data_base        # $26 <= seg_data_base
+        lw      $26, 0($26)         # $26 <= M[seg_data_base]
+        mtc0    $26, $14         # EPC <= $26  (EPC == $14)
+								# le main est charge par le compilateur à seg_data_base(ctor)
 	eret
 
 	.end	reset
