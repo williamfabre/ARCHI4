@@ -3,6 +3,7 @@
 *.ko
 *.obj
 *.elf
+*.bin
 
 # exec files
 *.x
@@ -12,3 +13,4 @@
 #output unused
 simulation.txt
 *.log
+*.txt
