@@ -23,7 +23,7 @@ reset:
 
 # initializes stack pointer
 	la	$27,	seg_stack_base
-        li $26, 0x1000		# $26 <= 64K
+        li $26, 0x10000		# $26 <= 64K
 	addu $29, $27, $26	# $29 <= seg_stack_base + 64K
 
 # initializes EPC register   
