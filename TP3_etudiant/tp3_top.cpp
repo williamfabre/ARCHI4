@@ -166,7 +166,7 @@ int _main(int argc, char *argv[])
 	// Mapping Table
 	//////////////////////////////////////////////////////////////////////////
 	// addr width (number of bits),
-	// VCI ADDRESS width subfileds for command packet routing 
+	// VCI ADDRESS width subfileds for command packet routing
 	// VCI RSRCID width for response packet routing
 	// cacheability mask
 	MappingTable maptab(addr_size, IntTab(srcid_size), IntTab(8), 0xfff00000);
