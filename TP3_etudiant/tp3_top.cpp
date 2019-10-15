@@ -169,7 +169,18 @@ int _main(int argc, char *argv[])
 	// VCI ADDRESS width subfileds for command packet routing
 	// VCI RSRCID width for response packet routing
 	// cacheability mask
-	MappingTable maptab(addr_size, IntTab(srcid_size), IntTab(8), 0xfff00000);
+	MappingTable maptab(addr_size,
+			    IntTab(srcid_size),
+			    IntTab(1),
+			    0xFE000000);
+
+			    //0xfff00000);
+				//SEG_RESET_BASE|SEG_KCODE_BASE|
+				//SEG_KDATA_BASE|SEG_DATA_BASE|
+				//SEG_CODE_BASE|SEG_STACK_BASE);
+				//SEG_CODE_BASE|SEG_STACK_BASE|
+				//SEG_KUNC_BASE| SEG_TTY_BASE| SEG_GCD_BASE);
+
 
 	maptab.add(Segment("seg_reset",
 			   SEG_RESET_BASE, SEG_RESET_SIZE, IntTab(TGTID_ROM), true));
@@ -248,6 +259,7 @@ int _main(int argc, char *argv[])
 					 IntTab(TGTID_TTY),
 					 maptab,
 					 "mylittletty",
+					 //"mybigtty",
 					 NULL);
 
 	// name, target, maptab

@@ -18,9 +18,8 @@ __attribute__((constructor)) void  main() // ecrit hello world puis attend un ca
 	{
 		// declaration de variable dans la portee
 		/*int i;*/
-		tty_printf("time is : %d ", proctime());
+		tty_printf("time START is : %d ", proctime());
 		tty_printf("cycle is : %d\n", it++);
-		tty_getc(&byte);
 		int opa = (rand()+1)%100;
 		int opb = (rand()+1)%100;
 		gcd_set_opa((unsigned int)opa);
@@ -32,11 +31,15 @@ __attribute__((constructor)) void  main() // ecrit hello world puis attend un ca
 
 		gcd_get_result(&res);
 
-		tty_printf("time is : %d ", proctime());
-		tty_printf("pgcd(%d,%d)=%d ",opa, opb, res);
+		tty_printf("time END is : %d ", proctime());
+		tty_printf("pgcd(%d,%d)=%d",opa, opb, res);
 		tty_printf("cycle is : %d\n", it++);
+		tty_printf("\n");
+		tty_printf("\n");
+		tty_printf("\n");
 
 
+		tty_getc(&byte);
 
 
 		/*tty_puts("\nhello world\n");*/
