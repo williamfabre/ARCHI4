@@ -72,26 +72,26 @@
 #define SEG_STACK_BASE  0x02000000
 #define SEG_STACK_SIZE  0x01000000
 
-#define SEG_TTY_BASE    TO BE COMPLETED
-#define SEG_TTY_SIZE    TO BE COMPLETED
+#define SEG_TTY_BASE    0x90000000
+#define SEG_TTY_SIZE    4*32*4 // 4 registres d'un mot par terminal pour 32 terminaux ?
 
-#define SEG_TIM_BASE    TO BE COMPLETED
-#define SEG_TIM_SIZE    TO BE COMPLETED
+#define SEG_TIM_BASE    0x91000000
+#define SEG_TIM_SIZE    4*4 // 4 registres d'un mot ?
 
-#define SEG_IOC_BASE    TO BE COMPLETED
-#define SEG_IOC_SIZE    TO BE COMPLETED
+#define SEG_IOC_BASE    0x92000000
+#define SEG_IOC_SIZE    9*4 // 9 registres d'un mot ?
 
-#define SEG_DMA_BASE    TO BE COMPLETED
-#define SEG_DMA_SIZE    TO BE COMPLETED
+#define SEG_DMA_BASE    0x93000000
+#define SEG_DMA_SIZE    5*4 // 5 registres d'un mot ?
 
-#define SEG_FBF_BASE    TO BE COMPLETED
-#define SEG_FBF_SIZE    TO BE COMPLETED
+#define SEG_FBF_BASE    0x96000000
+#define SEG_FBF_SIZE    128*128*1 // image 128x128 1 octet par pixel
 
-#define SEG_ICU_BASE    TO BE COMPLETED
-#define SEG_ICU_SIZE    TO BE COMPLETED
+#define SEG_ICU_BASE    0x9F000000
+#define SEG_ICU_SIZE    5*4 // 5 registres d'un mot ?
 
-#define SEG_GCD_BASE    TO BE COMPLETED
-#define SEG_GCD_SIZE    TO BE COMPLETED
+#define SEG_GCD_BASE    0x95000000
+#define SEG_GCD_SIZE    4*4  // 4 registres d'un mot ?
 
 // SRCID definition
 #define SRCID_PROC      0
@@ -231,13 +231,13 @@ int _main(int argc, char *argv[])
     maptab.add(Segment("seg_data"  , SEG_DATA_BASE  , SEG_DATA_SIZE  , IntTab(TGTID_RAM), true));
     maptab.add(Segment("seg_stack" , SEG_STACK_BASE , SEG_STACK_SIZE , IntTab(TGTID_RAM), true));
 
-    maptab.add(Segment("seg_tty"   , TO BE COMPLETED                                           ));
-    maptab.add(Segment("seg_timer" , TO BE COMPLETED                                           ));
-    maptab.add(Segment("seg_icu"   , TO BE COMPLETED                                           ));
-    maptab.add(Segment("seg_dma"   , TO BE COMPLETED                                           ));
-    maptab.add(Segment("seg_fbf"   , TO BE COMPLETED                                           ));
-    maptab.add(Segment("seg_ioc"   , TO BE COMPLETED                                           ));
-    maptab.add(Segment("seg_gcd"   , TO BE COMPLETED                                           ));
+    maptab.add(Segment("seg_tty"   , SEG_TTY_BASE   , SEG_TTY_SIZE   , IntTab(TGTID_TTY), false));
+    maptab.add(Segment("seg_timer" , SEG_TIMER_BASE , SEG_TIMER_SIZE , IntTab(TGTID_TIMER), false));
+    maptab.add(Segment("seg_icu"   , SEG_ICU_BASE   , SEG_ICU_SIZE   , IntTab(TGTID_ICU), false));
+    maptab.add(Segment("seg_dma"   , SEG_DMA_BASE   , SEG_DMA_SIZE   , IntTab(TGTID_DMA), false));
+    maptab.add(Segment("seg_fbf"   , SEG_FBF_BASE   , SEG_FBF_SIZE   , IntTab(TGTID_FBF), false));
+    maptab.add(Segment("seg_ioc"   , SEG_IOC_BASE   , SEG_IOC_SIZE   , IntTab(TGTID_IOC), false));
+    maptab.add(Segment("seg_gcd"   , SEG_GCD_BASE   , SEG_GCD_SIZE   , IntTab(TGTID_GCD), false));
 
     std::cout << std::endl << maptab << std::endl;
 
