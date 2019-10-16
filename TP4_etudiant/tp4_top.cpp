@@ -209,7 +209,7 @@ int _main(int argc, char *argv[])
     std::cout << "    ncycles      = " << ncycles << std::endl;
     std::cout << "    sys_pathname = " << sys_path << std::endl;
     std::cout << "    app_pathname = " << app_path << std::endl;
-    std::cout << "    ioc_filename = " << soft_name << std::endl;
+    std::cout << "    ioc_filename = " << ioc_filename << std::endl;
     std::cout << "    icache_sets  = " << icache_sets << std::endl;
     std::cout << "    icache_words = " << icache_words << std::endl;
     std::cout << "    icache_ways  = " << icache_ways << std::endl;
@@ -306,7 +306,7 @@ int _main(int argc, char *argv[])
     icu = new VciIcu<vci_param>("icu", IntTab(TGTID_ICU), maptab, 4);
 
     VciDma<vci_param>* dma;
-    dma = new VciDma<vci_param>("dma", maptab ,IntTab(SRCID_DMMA) ,IntTab(TGTID_DMA), 4); // Burst size 4 ?
+    dma = new VciDma<vci_param>("dma", maptab ,IntTab(SRCID_DMA) ,IntTab(TGTID_DMA), 4); // Burst size 4 ?
 
     VciFrameBuffer<vci_param>* fbf;
     fbf = new VciFrameBuffer<vci_param>("fbf", IntTab(TGTID_FBF), maptab, fbf_size, 128); // on laisse le sub-sampling par defaut
@@ -379,12 +379,12 @@ int _main(int argc, char *argv[])
 
     bus->p_clk                      (signal_clk);
     bus->p_resetn                   (signal_resetn);
-    bus->p_to_initiator[SRCID_PROC] (signal_vci_init_proc=;
+    bus->p_to_initiator[SRCID_PROC] (signal_vci_init_proc);
     bus->p_to_initiator[SRCID_DMA]  (signal_vci_init_dma);
     bus->p_to_initiator[SRCID_IOC]  (signal_vci_init_ioc);
     bus->p_to_target[TGTID_ROM]     (signal_vci_tgt_rom);
     bus->p_to_target[TGTID_RAM]     (signal_vci_tgt_ram);
-    bus->p_to_target[TGTID_TTY]     (signal_vci_tgt_tty;
+    bus->p_to_target[TGTID_TTY]     (signal_vci_tgt_tty);
     bus->p_to_target[TGTID_GCD]     (signal_vci_tgt_gcd);
     bus->p_to_target[TGTID_TIM]     (signal_vci_tgt_tim);
     bus->p_to_target[TGTID_ICU]     (signal_vci_tgt_icu);
