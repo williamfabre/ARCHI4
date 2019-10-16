@@ -232,7 +232,7 @@ int _main(int argc, char *argv[])
     maptab.add(Segment("seg_stack" , SEG_STACK_BASE , SEG_STACK_SIZE , IntTab(TGTID_RAM), true));
 
     maptab.add(Segment("seg_tty"   , SEG_TTY_BASE   , SEG_TTY_SIZE   , IntTab(TGTID_TTY), false));
-    maptab.add(Segment("seg_timer" , SEG_TIMER_BASE , SEG_TIMER_SIZE , IntTab(TGTID_TIMER), false));
+    maptab.add(Segment("seg_timer" , SEG_TIM_BASE   , SEG_TIM_SIZE   , IntTab(TGTID_TIM), false));
     maptab.add(Segment("seg_icu"   , SEG_ICU_BASE   , SEG_ICU_SIZE   , IntTab(TGTID_ICU), false));
     maptab.add(Segment("seg_dma"   , SEG_DMA_BASE   , SEG_DMA_SIZE   , IntTab(TGTID_DMA), false));
     maptab.add(Segment("seg_fbf"   , SEG_FBF_BASE   , SEG_FBF_SIZE   , IntTab(TGTID_FBF), false));
@@ -300,7 +300,7 @@ int _main(int argc, char *argv[])
     gcd = new VciGcdCoprocessor<vci_param>("gcd", IntTab(TGTID_GCD), maptab);
 
     VciTimer<vci_param>* timer;
-    timer = new VciTimer<vci_param>(TO BE COMPLETED);
+    timer = new VciTimer<vci_param>("timer", IntTab(TGTID_TI));
 
     VciIcu<vci_param>* icu;
     icu = new VciIcu<vci_param>(TO BE COMLETED);
