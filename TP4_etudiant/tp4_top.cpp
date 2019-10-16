@@ -300,22 +300,22 @@ int _main(int argc, char *argv[])
     gcd = new VciGcdCoprocessor<vci_param>("gcd", IntTab(TGTID_GCD), maptab);
 
     VciTimer<vci_param>* timer;
-    timer = new VciTimer<vci_param>("timer", IntTab(TGTID_TI));
+    timer = new VciTimer<vci_param>("timer", IntTab(TGTID_TIM), maptab, 1);
 
     VciIcu<vci_param>* icu;
-    icu = new VciIcu<vci_param>(TO BE COMLETED);
+    icu = new VciIcu<vci_param>("icu", IntTab(TGTID_ICU), maptab, 4);
 
     VciDma<vci_param>* dma;
-    dma = new VciDma<vci_param>(TO BE COMPLETED);
+    dma = new VciDma<vci_param>("dma", maptab ,IntTab(SRCID_DMMA) ,IntTab(TGTID_DMA), 4); // Burst size 4 ?
 
     VciFrameBuffer<vci_param>* fbf;
-    fbf = new VciFrameBuffer<vci_param>(TO BE COMPLETED);
+    fbf = new VciFrameBuffer<vci_param>("fbf", IntTab(TGTID_FBF), maptab, fbf_size, 128); // on laisse le sub-sampling par defaut
 
     VciBlockDevice<vci_param>* ioc;
-    ioc = new VciBlockDevice<vci_param>(TO BE COMPLETED); 
+    ioc = new VciBlockDevice<vci_param>("ioc", maptab, IntTab(SRCID_IOC), IntTab(TGTID_IOC), ioc_filename); // block size par defaut (512) et latency par defaut (0)
 
     VciVgsb<vci_param>* bus;
-    bus = new VciVgsb<vci_param>(TO BE COMPLETED);
+    bus = new VciVgsb<vci_param>("bus", maptab, 2, 4);
 
     //////////////////////////////////////////////////////////////////////////
     // Net-List
