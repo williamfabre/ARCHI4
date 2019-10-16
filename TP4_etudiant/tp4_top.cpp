@@ -356,10 +356,10 @@ int _main(int argc, char *argv[])
     icu->p_resetn                   (signal_resetn);
     icu->p_vci                      (signal_vci_tgt_icu);
     icu->p_irq                      (signal_irq_proc);
-    icu->p_irq_in[0]                (TO BE COMPLETED);
-    icu->p_irq_in[1]                (TO BE COMPLETED);
-    icu->p_irq_in[2]                (TO BE COMPLETED);
-    icu->p_irq_in[3]                (TO BE COMPLETED);
+    icu->p_irq_in[0]                (signal_irq_tim);
+    icu->p_irq_in[1]                (signal_irq_tty);
+    icu->p_irq_in[2]                (signal_irq_ioc);
+    icu->p_irq_in[3]                (signal_irq_dma);
 
     fbf->p_clk                      (signal_clk);
     fbf->p_resetn                   (signal_resetn);
