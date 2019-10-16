@@ -379,18 +379,18 @@ int _main(int argc, char *argv[])
 
     bus->p_clk                      (signal_clk);
     bus->p_resetn                   (signal_resetn);
-    bus->p_to_initiator[SRCID_PROC] (TO BE COMPLETED);
-    bus->p_to_initiator[SRCID_DMA]  (TO BE COMPLETED);
-    bus->p_to_initiator[SRCID_IOC]  (TO BE COMPLETED);
-    bus->p_to_target[TGTID_ROM]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_RAM]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_TTY]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_GCD]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_TIM]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_ICU]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_DMA]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_FBF]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_IOC]     (TO BE COMPLETED);
+    bus->p_to_initiator[SRCID_PROC] (signal_vci_init_proc=;
+    bus->p_to_initiator[SRCID_DMA]  (signal_vci_init_dma);
+    bus->p_to_initiator[SRCID_IOC]  (signal_vci_init_ioc);
+    bus->p_to_target[TGTID_ROM]     (signal_vci_tgt_rom);
+    bus->p_to_target[TGTID_RAM]     (signal_vci_tgt_ram);
+    bus->p_to_target[TGTID_TTY]     (signal_vci_tgt_tty;
+    bus->p_to_target[TGTID_GCD]     (signal_vci_tgt_gcd);
+    bus->p_to_target[TGTID_TIM]     (signal_vci_tgt_tim);
+    bus->p_to_target[TGTID_ICU]     (signal_vci_tgt_icu);
+    bus->p_to_target[TGTID_DMA]     (signal_vci_tgt_dma);
+    bus->p_to_target[TGTID_FBF]     (signal_vci_tgt_fbf);
+    bus->p_to_target[TGTID_IOC]     (signal_vci_tgt_ioc);
 
     //////////////////////////////////////////////////////////////////////////
     // simulation
