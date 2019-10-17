@@ -51,6 +51,10 @@
 #include "vci_framebuffer.h"
 #include "vci_simple_ram.h"
 
+#define FB_NPIXEL	128	// Frame buffer width
+#define FB_NLINE	128	// Frame buffer heigth
+
+
 #define SEG_RESET_BASE  0xBFC00000
 #define SEG_RESET_SIZE  0x00001000
 
@@ -73,24 +77,24 @@
 #define SEG_STACK_SIZE  0x01000000
 
 #define SEG_TTY_BASE    0x90000000
-#define SEG_TTY_SIZE    4*32*4 // 4 registres d'un mot par terminal pour 32 terminaux ?
+#define SEG_TTY_SIZE    16*nprocs // 4 registres d'un mot par terminal pour 32 terminaux ?
 #define SEG_TIM_BASE    0x91000000
-#define SEG_TIM_SIZE    4*4 // 4 registres d'un mot ?
+#define SEG_TIM_SIZE    16*nprocs // 4 registres d'un mot ?
 
 #define SEG_IOC_BASE    0x92000000
 #define SEG_IOC_SIZE    9*4 // 9 registres d'un mot ?
 
 #define SEG_DMA_BASE    0x93000000
-#define SEG_DMA_SIZE    5*4 // 5 registres d'un mot ?
+#define SEG_DMA_SIZE    0x00000020 // 5 registres d'un mot ?
 
 #define SEG_FBF_BASE    0x96000000
-#define SEG_FBF_SIZE    128*128*1 // image 128x128 1 octet par pixel
+#define SEG_FBF_SIZE    FB_NPIXEL*FBNLINE // image 128x128 1 octet par pixel
 
 #define SEG_ICU_BASE    0x9F000000
-#define SEG_ICU_SIZE    5*4 // 5 registres d'un mot ?
+#define SEG_ICU_SIZE    32*nprocs// 5 registres d'un mot ?
 
 #define SEG_GCD_BASE    0x95000000
-#define SEG_GCD_SIZE    4*4  // 4 registres d'un mot ?
+#define SEG_GCD_SIZE    16*nprocs // 4 registres d'un mot ?
 
 // SRCID definition
 #define SRCID_PROC      0
