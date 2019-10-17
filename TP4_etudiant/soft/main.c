@@ -3,15 +3,16 @@
 __attribute__((constructor)) void main()
 {
 	char  byte;
-	/*int it=0;*/
-	/*int res = -1;*/
-	/*int status = 0;*/
 
 	while(1)
 	{
-		tty_puts("my little program");
-		tty_getc_irq(&byte);
+		tty_puts("my little program\n");
+		tty_puts("a set timer\n");
+		tty_puts("d unset timer\n");
+		tty_puts("q exit\n");
+		timer_set_period(500000);
 
+		tty_getc_irq(&byte);
 		switch(byte)
 		{
 		case 'a':
