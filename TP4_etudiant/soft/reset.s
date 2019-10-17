@@ -34,23 +34,23 @@ reset:
 
 # initializes interrupt vector
     la      $26,    _interrupt_vector   # interrupt vector address
-    la      $27,    _isr_timer           
+    la      $27,    _isr_timer          # load _ist_timer dans $27
     sw      $27,    0($26)              # interrupt_vector[0] <= _isr_timer
-    la      TO BE COMPLETED              
-    sw      TO BE COMPLETED             # interrupt_vector[1] <= _isr_tty_get_task0
-    la      TO BE COMPLETED              
-    sw      TO BE COMPLETED             # interrupt_vector[2] <= _isr_ioc
-    la      TO BE COMPLETED             
-    sw      TO BE COMPLETED             # interrupt_vector[3] <= _isr_dma
+    la      $27,    _isr_tty_get_task0  # load _ist_tty_get_task0
+    sw      $27,    4($26)              # interrupt_vector[1] <= _isr_tty_get_task0
+    la      $27,    _isr_ioc         
+    sw      $27,    8($26)              # interrupt_vector[2] <= _isr_ioc
+    la      $27,    _isr_dma        
+    sw      $27,    12($26)             # interrupt_vector[3] <= _isr_dma
 
 # initializes ICU
     la      $26,    seg_icu_base
-    li      TO BE COMPLETED             # IRQ[0] IRQ[1] IRQ[2] IRQ[3]
-    sw      TO BE COMPLETED             # ICU_MASK_SET
+    li      $27,     0b0000001111        # IRQ[0] IRQ[1] IRQ[2] IRQ[3]
+    sw      $27,     8($26)              # ICU_MASK_SET car il y a ICU_INT puis ICE_MASK puis ICU_MASK_SET
 
 # initializes SR register
-    li	    $26,    0x0000FF13		
-    mtc0    $26,    $12			# SR <= user mode / IRQ enable (after eret)
+    li	    $26,    0x0000FF13
+    mtc0    $26,    $12                 # SR <= user mode / IRQ enable (after eret)
 
 # jumps to main 
     la      $26,    seg_data_base

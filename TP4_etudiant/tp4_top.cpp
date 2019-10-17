@@ -74,6 +74,8 @@
 
 #define SEG_TTY_BASE    0x90000000
 #define SEG_TTY_SIZE    4*32*4 // 4 registres d'un mot par terminal pour 32 terminaux ?
+                                // C'est pas justement 32oct par term pour 32
+                                // terms ? TODO
 
 #define SEG_TIM_BASE    0x91000000
 #define SEG_TIM_SIZE    4*4 // 4 registres d'un mot ?
@@ -150,8 +152,8 @@ int _main(int argc, char *argv[])
     // command line arguments
     ///////////////////////////////////////////////////////////////
     int     ncycles             = 1000000000;       // simulated cycles
-    char    sys_path[256]       = "soft/sys_bin";   // pathname for system code
-    char    app_path[256]       = "soft/app_bin";   // pathname for application code
+    char    sys_path[256]       = "soft/sys.bin";   // pathname for system code
+    char    app_path[256]       = "soft/app.bin";   // pathname for application code
     char    ioc_filename[256]   = "to_be_defined";  // pathname for the ioc file
     size_t  fbf_size            = 128;              // number of lines = number of pixels
     bool    debug               = false;            // debug activated
