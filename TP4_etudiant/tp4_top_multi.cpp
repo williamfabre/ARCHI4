@@ -59,8 +59,6 @@
 #define FB_NPIXEL	128	// Frame buffer width
 #define FB_NLINE	128	// Frame buffer heigth
 
-
-
 #define SEG_RESET_BASE  0xBFC00000
 #define SEG_RESET_SIZE  0x00001000
 
@@ -83,9 +81,9 @@
 #define SEG_STACK_SIZE  0x01000000
 
 #define SEG_TTY_BASE    0x90000000
-#define SEG_TTY_SIZE    16*nprocs // 4 registres d'un mot par terminal pour 32 terminaux ?
+#define SEG_TTY_SIZE    16*NPROCS // 4 registres d'un mot par terminal pour 32 terminaux ?
 #define SEG_TIM_BASE    0x91000000
-#define SEG_TIM_SIZE    16*nprocs // 4 registres d'un mot ?
+#define SEG_TIM_SIZE    16*NPROCS // 4 registres d'un mot ?
 
 #define SEG_IOC_BASE    0x92000000
 #define SEG_IOC_SIZE    9*4 // 9 registres d'un mot ?
@@ -97,10 +95,10 @@
 #define SEG_FBF_SIZE    FB_NPIXEL*FB_NLINE // image 128x128 1 octet par pixel
 
 #define SEG_ICU_BASE    0x9F000000
-#define SEG_ICU_SIZE    32*nprocs// 5 registres d'un mot ?
+#define SEG_ICU_SIZE    32*NPROCS// 5 registres d'un mot ?
 
 #define SEG_GCD_BASE    0x95000000
-#define SEG_GCD_SIZE    16*nprocs // 4 registres d'un mot ?
+#define SEG_GCD_SIZE    16*NPROCS// 4 registres d'un mot ?
 
 // SRCID definition
 #define SRCID_PROC      0
@@ -158,7 +156,7 @@ int _main(int argc, char *argv[])
     ///////////////////////////////////////////////////////////////
     // command line arguments
     ///////////////////////////////////////////////////////////////
-    int     nprocs              = NPROCS;           // number of processors
+    int     nprocs              = 4;           // number of processors
     int     ncycles             = 1000000000;       // simulated cycles
     char    sys_path[256]       = "soft/sys.bin";   // pathname for system code
     char    app_path[256]       = "soft/app.bin";   // pathname for application code
