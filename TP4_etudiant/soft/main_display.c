@@ -7,7 +7,7 @@
 
 
 
-__attribute__((constructor)) void main()
+__attribute__((constructor)) void main_display()
 {
 	char buf_in[NB_LINES*NB_PIXELS];
 	char byte;

@@ -19,7 +19,8 @@ SYS_OBJS=  reset.o \
            exc_handler.o 
 
 APP_OBJS=  stdio.o \
-	   main.o 
+	   main.o \
+	   main_display.o
 
 GIET_SYS_PATH= /users/enseig/alain/giet_2011/sys
 GIET_APP_PATH= /users/enseig/alain/giet_2011/app
@@ -81,6 +82,10 @@ stdio.o: $(GIET_APP_PATH)/stdio.c $(GIET_APP_PATH)/stdio.h
 	#$(DU) -D $@ > $@.txt
 
 main.o: main.c
+	$(CC) $(CFLAGS) -I$(GIET_APP_PATH) -I. -c -o $@ $<
+	$(DU) -D $@ > $@.txt
+
+main_display.o: main_display.c
 	$(CC) $(CFLAGS) -I$(GIET_APP_PATH) -I. -c -o $@ $<
 	$(DU) -D $@ > $@.txt
 

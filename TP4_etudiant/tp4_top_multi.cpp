@@ -55,7 +55,7 @@
 #include "vci_simple_ram.h"
 #include "alloc_elems.h" // PATCHED
 
-#define NPROCS 1
+#define NPROCS 4
 #define FB_NPIXEL	128	// Frame buffer width
 #define FB_NLINE	128	// Frame buffer heigth
 
@@ -203,8 +203,8 @@ int _main(int argc, char *argv[])
             else if( (strcmp(argv[n],"-NPROCS") == 0) && (n+1<argc) )
             {
                 nprocs = atoi(argv[n+1]);
-                if (!(nprocs > 0 && nprocs < 4))
-                    nprocs = 1;
+                //if (!(nprocs < 0 || nprocs > 4))
+                    //nprocs = 1;
             }
             else
             {
@@ -212,6 +212,7 @@ int _main(int argc, char *argv[])
                 std::cout << "   The order is not important." << std::endl;
                 std::cout << "   Accepted arguments are :" << std::endl << std::endl;
                 std::cout << "   -NCYCLES number_of_simulated_cycles" << std::endl;
+                std::cout << "   -NPROCS number_of_simulated_procs" << std::endl;
                 std::cout << "   -IOCFILE file_name" << std::endl;
                 std::cout << "   -FBFSIZE number_of_pixels" << std::endl;
                 std::cout << "   -SYS sys_elf_pathname" << std::endl;
@@ -223,7 +224,7 @@ int _main(int argc, char *argv[])
     }
     std::cout << std::endl;
     std::cout << "    ncycles      = " << ncycles << std::endl;
-    std::cout << "    nprocs      = " << nprocs << std::endl;
+    std::cout << "    nprocs      =  "  << nprocs << std::endl;
     std::cout << "    sys_pathname = " << sys_path << std::endl;
     std::cout << "    app_pathname = " << app_path << std::endl;
     std::cout << "    ioc_filename = " << ioc_filename << std::endl;
