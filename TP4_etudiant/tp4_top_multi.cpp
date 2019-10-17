@@ -284,9 +284,9 @@ int _main(int argc, char *argv[])
 
     //sc_signal<bool> signal_irq_proc("signal_irq_proc");
     sc_signal<bool>* signal_irq_proc = alloc_elems<sc_signal<bool> >("signal_irq_proc", nprocs);
-    sc_signal<bool>* signal_irq_tim = alloc_elems<sc_signal<bool> >("signal_irq_tim", nprocs);
-    sc_signal<bool>* signal_irq_tty = alloc_elems<sc_signal<bool> >("signal_irq_tty", nprocs);
-    sc_signal<bool>* signal_irq_dma = alloc_elems<sc_signal<bool> >("signal_irq_dma", nprocs);
+    sc_signal<bool>* signal_irq_tim = alloc_elems<sc_signal<bool> >("signal_irq_tim", 4);
+    sc_signal<bool>* signal_irq_tty = alloc_elems<sc_signal<bool> >("signal_irq_tty", 4);
+    sc_signal<bool>* signal_irq_dma = alloc_elems<sc_signal<bool> >("signal_irq_dma", 4);
     sc_signal<bool> signal_irq_ioc("signal_irq_ioc");
 
     ///////////////////////////////////////////////////////////////
@@ -335,18 +335,25 @@ int _main(int argc, char *argv[])
     //VciMultiTty<vci_param>* tty;
     //tty = new VciMultiTty<vci_param>("tty", IntTab(TGTID_TTY), maptab, "tty", NULL);
     VciMultiTty<vci_param>* tty;
-    tty = new VciMultiTty<vci_param>("tty", IntTab(TGTID_TTY), maptab, names_for_tty);
+    tty = new VciMultiTty<vci_param>("tty",
+                                     IntTab(TGTID_TTY),
+                                     maptab,
+                                     names_for_tty);
 
     std::cout << "multi tty constructed" << std::endl;
 
     VciGcdCoprocessor<vci_param>* gcd;
-    gcd = new VciGcdCoprocessor<vci_param>("gcd", IntTab(TGTID_GCD), maptab);
+    gcd = new VciGcdCoprocessor<vci_param>("gcd",
+                                           IntTab(TGTID_GCD),
+                                           maptab);
 
     std::cout << "gcd constructed" << std::endl;
 
     VciTimer<vci_param>* timer;
-    timer = new VciTimer<vci_param>("timer", IntTab(TGTID_TIM), maptab, nprocs);
-
+    timer = new VciTimer<vci_param>("timer",
+                                    IntTab(TGTID_TIM),
+                                    maptab,
+                                    nprocs);
     std::cout << "timer constructed" << std::endl;
 
     //VciIcu<vci_param>* icu;
