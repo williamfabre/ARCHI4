@@ -1,5 +1,5 @@
 
-all : mono multi
+all : mono 
 
 mono : tp4_top.desc tp4_top.cpp
 	soclib-cc -P -p tp4_top.desc -o simulator.x
