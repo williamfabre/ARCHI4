@@ -458,11 +458,12 @@ int _main(int argc, char *argv[])
         icu->p_irq_out[i]            (signal_irq_proc[i]);
     }
     //IRQ_IN
-    for (int i=0; i<32; i++){
-        icu->p_irq_in[i]            (signal_false);
-    }
+    //
     //IRQ IOC
     icu->p_irq_in[0]                (signal_irq_ioc);
+    icu->p_irq_in[1]            (signal_false);
+    icu->p_irq_in[2]            (signal_false);
+    icu->p_irq_in[3]            (signal_false);
     // IRQ DMA
     icu->p_irq_in[4]                (signal_irq_dma[0]);
     icu->p_irq_in[5]                (signal_irq_dma[1]);
@@ -478,6 +479,12 @@ int _main(int argc, char *argv[])
     icu->p_irq_in[13]               (signal_irq_tty[1]);
     icu->p_irq_in[14]               (signal_irq_tty[2]);
     icu->p_irq_in[15]               (signal_irq_tty[3]);
+
+
+    for (int i=16; i<32; i++){
+        icu->p_irq_in[i]            (signal_false);
+    }
+
     //icu->p_irq_in[0]                (signal_irq_tim);
     //icu->p_irq_in[1]                (signal_irq_tty);
     //icu->p_irq_in[2]                (signal_irq_ioc);
@@ -529,37 +536,37 @@ int _main(int argc, char *argv[])
     // simulation
     //////////////////////////////////////////////////////////////////////////
 
-    //signal_false = false;
-    //signal_resetn = false;
-    //sc_start( sc_time( 1, SC_NS ) ) ;
+    signal_false = false;
+    signal_resetn = false;
+    sc_start( sc_time( 1, SC_NS ) ) ;
 
-    //signal_resetn = true;
-    //for ( int n=1 ; n<ncycles ; n++ )
-    //{
-        //if( debug && (n > from_cycle) )
-        //{
-            //std::cout << "***************** cycle " << std::dec << n << std::endl;
-            //for (int i=0; i<nprocs; i++){
-                //proc[i]->print_trace(1);
-            //}
-            //bus->print_trace();
-            //timer->print_trace();
-            //rom->print_trace();
-            //ram->print_trace();
+    signal_resetn = true;
+    for ( int n=1 ; n<ncycles ; n++ )
+    {
+        if( debug && (n > from_cycle) )
+        {
+            std::cout << "***************** cycle " << std::dec << n << std::endl;
+            for (int i=0; i<nprocs; i++){
+                proc[i]->print_trace(1);
+            }
+            bus->print_trace();
+            timer->print_trace();
+            rom->print_trace();
+            ram->print_trace();
 
-            //for (int i=0; i<nprocs; i++){
-                //if( signal_irq_proc[i].read() ) std::cout << "IRQ_PROC " << std::dec << i << std::endl;
-                //if( signal_irq_tim[i].read() )  std::cout << "IRQ_TIM"   << std::dec << i << std::endl;
-                //if( signal_irq_tty[i].read() )  std::cout << "IRQ_TTY"   << std::dec << i << std::endl;
-                //if( signal_irq_dma[i].read() )  std::cout << "IRQ_DMA"   << std::dec << i << std::endl;
-            //}
+            for (int i=0; i<nprocs; i++){
+                if( signal_irq_proc[i].read() ) std::cout << "IRQ_PROC " << std::dec << i << std::endl;
+                if( signal_irq_tim[i].read() )  std::cout << "IRQ_TIM"   << std::dec << i << std::endl;
+                if( signal_irq_tty[i].read() )  std::cout << "IRQ_TTY"   << std::dec << i << std::endl;
+                if( signal_irq_dma[i].read() )  std::cout << "IRQ_DMA"   << std::dec << i << std::endl;
+            }
 
-            //if( signal_irq_ioc.read() )  std::cout << "IRQ_IOC"  << std::endl;
-        //}
-        //sc_start( sc_time( 1 , SC_NS ) ) ;
-    //}
+            if( signal_irq_ioc.read() )  std::cout << "IRQ_IOC"  << std::endl;
+        }
+        sc_start( sc_time( 1 , SC_NS ) ) ;
+    }
 
-    //sc_stop();
+    sc_stop();
 
     return(0);
 
