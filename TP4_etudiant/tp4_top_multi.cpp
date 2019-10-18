@@ -81,7 +81,8 @@
 #define SEG_STACK_SIZE  0x01000000
 
 #define SEG_TTY_BASE    0x90000000
-#define SEG_TTY_SIZE    16*NPROCS // 4 registres d'un mot par terminal pour 32 terminaux ?
+#define SEG_TTY_SIZE    16*32// 4 registres d'un mot par terminal pour 32 terminaux ?
+
 #define SEG_TIM_BASE    0x91000000
 #define SEG_TIM_SIZE    16*NPROCS // 4 registres d'un mot ?
 
@@ -202,7 +203,7 @@ int _main(int argc, char *argv[])
             {
                 nprocs = atoi(argv[n+1]);
                 //if (!(nprocs < 0 || nprocs > 4))
-                    //nprocs = 1;
+                //nprocs = 1;
             }
             else
             {
@@ -284,9 +285,9 @@ int _main(int argc, char *argv[])
 
     //sc_signal<bool> signal_irq_proc("signal_irq_proc");
     sc_signal<bool>* signal_irq_proc = alloc_elems<sc_signal<bool> >("signal_irq_proc", nprocs);
-    sc_signal<bool>* signal_irq_tim = alloc_elems<sc_signal<bool> >("signal_irq_tim", 4);
-    sc_signal<bool>* signal_irq_tty = alloc_elems<sc_signal<bool> >("signal_irq_tty", 4);
-    sc_signal<bool>* signal_irq_dma = alloc_elems<sc_signal<bool> >("signal_irq_dma", 4);
+    sc_signal<bool>* signal_irq_tim = alloc_elems<sc_signal<bool> >("signal_irq_tim", nprocs);
+    sc_signal<bool>* signal_irq_tty = alloc_elems<sc_signal<bool> >("signal_irq_tty", nprocs);
+    sc_signal<bool>* signal_irq_dma = alloc_elems<sc_signal<bool> >("signal_irq_dma", nprocs);
     sc_signal<bool> signal_irq_ioc("signal_irq_ioc");
 
     ///////////////////////////////////////////////////////////////
@@ -311,12 +312,12 @@ int _main(int argc, char *argv[])
     {
         name_proc[i] = new char[16];
         name_tty[i] = new char[16];
-        sprintf(name_proc[i], "proc%d", i);
-        proc[i] = new VciXcacheWrapper<vci_param,Mips32ElIss>(name_proc[i], 0, maptab, IntTab(i),
+        sprintf(name_proc[i], "proc[%d]", i);
+        proc[i] = new VciXcacheWrapper<vci_param,Mips32ElIss>(name_proc[i], i, maptab, IntTab(i),
                                                               icache_ways, icache_sets, icache_words,
                                                               dcache_ways, dcache_sets, dcache_words);
         // definition des noms des tty
-        sprintf(name_tty[i], "tty%d", i);
+        sprintf(name_tty[i], "tty[%d]", i);
         names_for_tty.push_back(name_tty[i]);
     }
 
@@ -365,10 +366,10 @@ int _main(int argc, char *argv[])
     // number of output channelWHY?
     VciMultiIcu<vci_param>* icu;
     icu = new VciMultiIcu<vci_param>("icu",
-                                           IntTab(TGTID_ICU),
-                                           maptab,
-                                           32, // 32 a mettre sinnon ca plante
-                                           nprocs);
+                                     IntTab(TGTID_ICU),
+                                     maptab,
+                                     32, // 32 a mettre sinnon ca plante
+                                     nprocs);
     std::cout << "Multi ICU constructed" << std::endl;
 
     //VciDma<vci_param>* dma;
@@ -376,12 +377,12 @@ int _main(int argc, char *argv[])
 
     VciMultiDma<vci_param>* dma; // dernier arg c'est le nb channel, le SRCID c'est maibntenant les procs
     dma = new VciMultiDma<vci_param>("dma",
-                                           maptab,
-                                           IntTab(nprocs),
-                                           IntTab(TGTID_DMA),
-                                           4*4,
-                                           nprocs);
-                                        // Burst size 4 ?
+                                     maptab,
+                                     IntTab(nprocs),
+                                     IntTab(TGTID_DMA),
+                                     4*4,
+                                     nprocs);
+    // Burst size 4 ?
     std::cout << "dma constructed" << std::endl;
 
     VciFrameBuffer<vci_param>* fbf;
@@ -461,16 +462,16 @@ int _main(int argc, char *argv[])
     std::cout << "icu connected" << std::endl;
 
     for (int i=0; i<nprocs; i++){
-     //IRQ_OUT
+        //IRQ_OUT
         icu->p_irq_out[i]            (signal_irq_proc[i]);
     }
     //IRQ_IN
     //
     //IRQ IOC
     icu->p_irq_in[0]                (signal_irq_ioc);
-    icu->p_irq_in[1]            (signal_false);
-    icu->p_irq_in[2]            (signal_false);
-    icu->p_irq_in[3]            (signal_false);
+    icu->p_irq_in[1]                (signal_false);
+    icu->p_irq_in[2]                (signal_false);
+    icu->p_irq_in[3]                (signal_false);
     // IRQ DMA
     icu->p_irq_in[4]                (signal_irq_dma[0]);
     icu->p_irq_in[5]                (signal_irq_dma[1]);
@@ -526,6 +527,7 @@ int _main(int argc, char *argv[])
     for (int i=0; i<nprocs; i++){
         bus->p_to_initiator[i]      (signal_vci_init_proc[i]);
     }
+
     bus->p_to_initiator[nprocs]     (signal_vci_init_ioc);
     bus->p_to_initiator[nprocs+1]   (signal_vci_init_dma);
 
