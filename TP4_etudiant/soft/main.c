@@ -9,6 +9,7 @@ __attribute__((constructor)) void main()
 		tty_puts("my little program\n");
 		tty_puts("a set timer\n");
 		tty_puts("d unset timer\n");
+		tty_printf(" PROCID : %d ", procid());
 		tty_puts("q exit\n");
 		timer_set_period(500000);
 

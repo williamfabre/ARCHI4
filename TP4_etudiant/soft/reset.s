@@ -48,11 +48,11 @@ proc0:
         la      $27,	_isr_ioc        # TO BE COMPLETED
         sw      $27,	0($26)			# _interrupt_vector[2] <= _isr_timer
         la      $27,	_isr_dma            # TO BE COMPLETED
-        sw      $27,	4($26)			# _interrupt_vector[3] <= _isr_tty_get
+        sw      $27,	4*4($26)			# _interrupt_vector[3] <= _isr_tty_get
         la      $27,	_isr_timer        # TO BE COMPLETED
-        sw      $27,	8($26)			# _interrupt_vector[0] <= _isr_dma
+        sw      $27,	4*8($26)			# _interrupt_vector[0] <= _isr_dma
         la      $27,	_isr_tty_get_task0 # TO BE COMPLETED
-        sw      $27,	12($26)			# _interrupt_vector[1] <= _isr_ioc
+        sw      $27,	4*12($26)			# _interrupt_vector[1] <= _isr_ioc
         #initializes the ICU[0] MASK register
         la      $26,	seg_icu_base
         addiu	$26,	$26,	0		# ICU[0]
@@ -76,14 +76,15 @@ proc0:
 
 proc1:
         # initialises interrupt vector entries for PROC[1]
+        la      $26,	_interrupt_vector
         la      $27,	_isr_ioc        # TO BE COMPLETED
         sw      $27,	0($26)			# _interrupt_vector[2] <= _isr_timer
         la      $27,	_isr_dma            # TO BE COMPLETED
-        sw      $27,	5($26)			# _interrupt_vector[3] <= _isr_tty_get
+        sw      $27,	4*5($26)			# _interrupt_vector[3] <= _isr_tty_get
         la      $27,	_isr_timer        # TO BE COMPLETED
-        sw      $27,	9($26)			# _interrupt_vector[0] <= _isr_dma
+        sw      $27,	4*9($26)			# _interrupt_vector[0] <= _isr_dma
         la      $27,	_isr_tty_get_task0 # TO BE COMPLETED
-        sw      $27,	13($26)			# _interrupt_vector[1] <= _isr_ioc
+        sw      $27,	4*13($26)			# _interrupt_vector[1] <= _isr_ioc
 
         #initializes the ICU[1] MASK register
         la      $26,	seg_icu_base
@@ -113,11 +114,11 @@ proc2:
         la      $27,	_isr_timer        # TO BE COMPLETED
         sw      $27,	0($26)			# _interrupt_vector[0] <= _isr_dma
         la      $27,	_isr_tty_get_task2 # TO BE COMPLETED
-        sw      $27,	4($26)			# _interrupt_vector[1] <= _isr_ioc
+        sw      $27,	4*6($26)			# _interrupt_vector[1] <= _isr_ioc
         la      $27,	_isr_ioc        # TO BE COMPLETED
-        sw      $27,	8($26)			# _interrupt_vector[2] <= _isr_timer
+        sw      $27,	4*10($26)			# _interrupt_vector[2] <= _isr_timer
         la      $27,	_isr_dma            # TO BE COMPLETED
-        sw      $27,	12($26)			# _interrupt_vector[3] <= _isr_tty_get
+        sw      $27,	4*14($26)			# _interrupt_vector[3] <= _isr_tty_get
 
         #initializes the ICU[2] MASK register
         la      $26,	seg_icu_base
