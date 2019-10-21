@@ -81,15 +81,16 @@
 #define SEG_STACK_SIZE  0x01000000
 
 #define SEG_TTY_BASE    0x90000000
-#define SEG_TTY_SIZE    16*NPROCS // 4 registres d'un mot par terminal pour 32 terminaux ?
+#define SEG_TTY_SIZE    16*NPROCS*4 // 4 registres d'un mot par terminal pour 32 terminaux ?
+
 #define SEG_TIM_BASE    0x91000000
-#define SEG_TIM_SIZE    16*NPROCS // 4 registres d'un mot ?
+#define SEG_TIM_SIZE    16*NPROCS// 4 registres
 
 #define SEG_IOC_BASE    0x92000000
-#define SEG_IOC_SIZE    9*4 // 9 registres d'un mot ?
+#define SEG_IOC_SIZE    36 // 9 registres
 
 #define SEG_DMA_BASE    0x93000000
-#define SEG_DMA_SIZE    0x00000020 // 5 registres d'un mot ?
+#define SEG_DMA_SIZE    32*NPROCS// 5 registres d'un mot ?
 
 #define SEG_FBF_BASE    0x96000000
 #define SEG_FBF_SIZE    FB_NPIXEL*FB_NLINE // image 128x128 1 octet par pixel
@@ -98,7 +99,7 @@
 #define SEG_ICU_SIZE    32*NPROCS// 5 registres d'un mot ?
 
 #define SEG_GCD_BASE    0x95000000
-#define SEG_GCD_SIZE    16*NPROCS// 4 registres d'un mot ?
+#define SEG_GCD_SIZE    16// 4 registres d'un mot ?
 
 // SRCID definition
 #define SRCID_PROC      0
@@ -158,15 +159,15 @@ int _main(int argc, char *argv[])
     ///////////////////////////////////////////////////////////////
     int     nprocs              = 4;           // number of processors
     int     ncycles             = 1000000000;       // simulated cycles
-    char    sys_path[256]       = "soft/sys.bin";   // pathname for system code
-    char    app_path[256]       = "soft/app.bin";   // pathname for application code
+    char    sys_path[256]       = "soft_multi/sys.bin";   // pathname for system code
+    char    app_path[256]       = "soft_multi/app.bin";   // pathname for application code
     char    ioc_filename[256]   = "images.raw";  // pathname for the ioc file
     size_t  fbf_size            = 128;              // number of lines = number of pixels
     bool    debug               = false;            // debug activated
     int     from_cycle          = 0;                // debug start cycle
 
     std::cout << std::endl << "********************************************************" << std::endl;
-    std::cout << std::endl << "******        tp4_soclib_mono                     ******" << std::endl;
+    std::cout << std::endl << "******        tp4_soclib_multi                    ******" << std::endl;
     std::cout << std::endl << "********************************************************" << std::endl;
 
     if (argc > 1)
@@ -202,7 +203,7 @@ int _main(int argc, char *argv[])
             {
                 nprocs = atoi(argv[n+1]);
                 //if (!(nprocs < 0 || nprocs > 4))
-                    //nprocs = 1;
+                //nprocs = 1;
             }
             else
             {
@@ -311,12 +312,12 @@ int _main(int argc, char *argv[])
     {
         name_proc[i] = new char[16];
         name_tty[i] = new char[16];
-        sprintf(name_proc[i], "proc%d", i);
-        proc[i] = new VciXcacheWrapper<vci_param,Mips32ElIss>(name_proc[i], 0, maptab, IntTab(i),
+        sprintf(name_proc[i], "proc[%d]", i);
+        proc[i] = new VciXcacheWrapper<vci_param,Mips32ElIss>(name_proc[i], i, maptab, IntTab(i),
                                                               icache_ways, icache_sets, icache_words,
                                                               dcache_ways, dcache_sets, dcache_words);
         // definition des noms des tty
-        sprintf(name_tty[i], "tty%d", i);
+        sprintf(name_tty[i], "tty[%d]", i);
         names_for_tty.push_back(name_tty[i]);
     }
 
@@ -335,18 +336,25 @@ int _main(int argc, char *argv[])
     //VciMultiTty<vci_param>* tty;
     //tty = new VciMultiTty<vci_param>("tty", IntTab(TGTID_TTY), maptab, "tty", NULL);
     VciMultiTty<vci_param>* tty;
-    tty = new VciMultiTty<vci_param>("tty", IntTab(TGTID_TTY), maptab, names_for_tty);
+    tty = new VciMultiTty<vci_param>("tty",
+                                     IntTab(TGTID_TTY),
+                                     maptab,
+                                     names_for_tty);
 
     std::cout << "multi tty constructed" << std::endl;
 
     VciGcdCoprocessor<vci_param>* gcd;
-    gcd = new VciGcdCoprocessor<vci_param>("gcd", IntTab(TGTID_GCD), maptab);
+    gcd = new VciGcdCoprocessor<vci_param>("gcd",
+                                           IntTab(TGTID_GCD),
+                                           maptab);
 
     std::cout << "gcd constructed" << std::endl;
 
     VciTimer<vci_param>* timer;
-    timer = new VciTimer<vci_param>("timer", IntTab(TGTID_TIM), maptab, nprocs);
-
+    timer = new VciTimer<vci_param>("timer",
+                                    IntTab(TGTID_TIM),
+                                    maptab,
+                                    nprocs);
     std::cout << "timer constructed" << std::endl;
 
     //VciIcu<vci_param>* icu;
@@ -358,10 +366,10 @@ int _main(int argc, char *argv[])
     // number of output channelWHY?
     VciMultiIcu<vci_param>* icu;
     icu = new VciMultiIcu<vci_param>("icu",
-                                           IntTab(TGTID_ICU),
-                                           maptab,
-                                           32, // 32 a mettre sinnon ca plante
-                                           nprocs);
+                                     IntTab(TGTID_ICU),
+                                     maptab,
+                                     32, // 32 a mettre sinnon ca plante
+                                     nprocs);
     std::cout << "Multi ICU constructed" << std::endl;
 
     //VciDma<vci_param>* dma;
@@ -369,12 +377,12 @@ int _main(int argc, char *argv[])
 
     VciMultiDma<vci_param>* dma; // dernier arg c'est le nb channel, le SRCID c'est maibntenant les procs
     dma = new VciMultiDma<vci_param>("dma",
-                                           maptab,
-                                           IntTab(nprocs),
-                                           IntTab(TGTID_DMA),
-                                           4*4,
-                                           nprocs);
-                                        // Burst size 4 ?
+                                     maptab,
+                                     IntTab(nprocs),
+                                     IntTab(TGTID_DMA),
+                                     4*4,
+                                     nprocs);
+    // Burst size 4 ?
     std::cout << "dma constructed" << std::endl;
 
     VciFrameBuffer<vci_param>* fbf;
@@ -382,7 +390,7 @@ int _main(int argc, char *argv[])
                                         IntTab(TGTID_FBF),
                                         maptab,
                                         fbf_size,
-                                        128);
+                                        fbf_size);
     // on laisse le sub-sampling par defaut
     std::cout << "fbf constructed" << std::endl;
 
@@ -454,15 +462,16 @@ int _main(int argc, char *argv[])
     std::cout << "icu connected" << std::endl;
 
     for (int i=0; i<nprocs; i++){
-     //IRQ_OUT
+        //IRQ_OUT
         icu->p_irq_out[i]            (signal_irq_proc[i]);
     }
     //IRQ_IN
-    for (int i=0; i<32; i++){
-        icu->p_irq_in[i]            (signal_false);
-    }
+    //
     //IRQ IOC
     icu->p_irq_in[0]                (signal_irq_ioc);
+    icu->p_irq_in[1]                (signal_false);
+    icu->p_irq_in[2]                (signal_false);
+    icu->p_irq_in[3]                (signal_false);
     // IRQ DMA
     icu->p_irq_in[4]                (signal_irq_dma[0]);
     icu->p_irq_in[5]                (signal_irq_dma[1]);
@@ -478,6 +487,12 @@ int _main(int argc, char *argv[])
     icu->p_irq_in[13]               (signal_irq_tty[1]);
     icu->p_irq_in[14]               (signal_irq_tty[2]);
     icu->p_irq_in[15]               (signal_irq_tty[3]);
+
+
+    for (int i=16; i<32; i++){
+        icu->p_irq_in[i]            (signal_false);
+    }
+
     //icu->p_irq_in[0]                (signal_irq_tim);
     //icu->p_irq_in[1]                (signal_irq_tty);
     //icu->p_irq_in[2]                (signal_irq_ioc);
@@ -512,6 +527,7 @@ int _main(int argc, char *argv[])
     for (int i=0; i<nprocs; i++){
         bus->p_to_initiator[i]      (signal_vci_init_proc[i]);
     }
+
     bus->p_to_initiator[nprocs]     (signal_vci_init_ioc);
     bus->p_to_initiator[nprocs+1]   (signal_vci_init_dma);
 
@@ -529,37 +545,37 @@ int _main(int argc, char *argv[])
     // simulation
     //////////////////////////////////////////////////////////////////////////
 
-    //signal_false = false;
-    //signal_resetn = false;
-    //sc_start( sc_time( 1, SC_NS ) ) ;
+    signal_false = false;
+    signal_resetn = false;
+    sc_start( sc_time( 1, SC_NS ) ) ;
 
-    //signal_resetn = true;
-    //for ( int n=1 ; n<ncycles ; n++ )
-    //{
-        //if( debug && (n > from_cycle) )
-        //{
-            //std::cout << "***************** cycle " << std::dec << n << std::endl;
-            //for (int i=0; i<nprocs; i++){
-                //proc[i]->print_trace(1);
-            //}
-            //bus->print_trace();
-            //timer->print_trace();
-            //rom->print_trace();
-            //ram->print_trace();
+    signal_resetn = true;
+    for ( int n=1 ; n<ncycles ; n++ )
+    {
+        if( debug && (n > from_cycle) )
+        {
+            std::cout << "***************** cycle " << std::dec << n << std::endl;
+            for (int i=0; i<nprocs; i++){
+                proc[i]->print_trace(1);
+            }
+            bus->print_trace();
+            timer->print_trace();
+            rom->print_trace();
+            ram->print_trace();
 
-            //for (int i=0; i<nprocs; i++){
-                //if( signal_irq_proc[i].read() ) std::cout << "IRQ_PROC " << std::dec << i << std::endl;
-                //if( signal_irq_tim[i].read() )  std::cout << "IRQ_TIM"   << std::dec << i << std::endl;
-                //if( signal_irq_tty[i].read() )  std::cout << "IRQ_TTY"   << std::dec << i << std::endl;
-                //if( signal_irq_dma[i].read() )  std::cout << "IRQ_DMA"   << std::dec << i << std::endl;
-            //}
+            for (int i=0; i<nprocs; i++){
+                if( signal_irq_proc[i].read() ) std::cout << "IRQ_PROC " << std::dec << i << std::endl;
+                if( signal_irq_tim[i].read() )  std::cout << "IRQ_TIM"   << std::dec << i << std::endl;
+                if( signal_irq_tty[i].read() )  std::cout << "IRQ_TTY"   << std::dec << i << std::endl;
+                if( signal_irq_dma[i].read() )  std::cout << "IRQ_DMA"   << std::dec << i << std::endl;
+            }
 
-            //if( signal_irq_ioc.read() )  std::cout << "IRQ_IOC"  << std::endl;
-        //}
-        //sc_start( sc_time( 1 , SC_NS ) ) ;
-    //}
+            if( signal_irq_ioc.read() )  std::cout << "IRQ_IOC"  << std::endl;
+        }
+        sc_start( sc_time( 1 , SC_NS ) ) ;
+    }
 
-    //sc_stop();
+    sc_stop();
 
     return(0);
 
