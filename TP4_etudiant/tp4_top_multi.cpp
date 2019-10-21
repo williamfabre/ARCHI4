@@ -81,16 +81,16 @@
 #define SEG_STACK_SIZE  0x01000000
 
 #define SEG_TTY_BASE    0x90000000
-#define SEG_TTY_SIZE    16*32// 4 registres d'un mot par terminal pour 32 terminaux ?
+#define SEG_TTY_SIZE    16*NPROCS*4 // 4 registres d'un mot par terminal pour 32 terminaux ?
 
 #define SEG_TIM_BASE    0x91000000
-#define SEG_TIM_SIZE    16*NPROCS // 4 registres d'un mot ?
+#define SEG_TIM_SIZE    16*NPROCS// 4 registres
 
 #define SEG_IOC_BASE    0x92000000
-#define SEG_IOC_SIZE    9*4 // 9 registres d'un mot ?
+#define SEG_IOC_SIZE    36 // 9 registres
 
 #define SEG_DMA_BASE    0x93000000
-#define SEG_DMA_SIZE    0x00000020 // 5 registres d'un mot ?
+#define SEG_DMA_SIZE    32*NPROCS// 5 registres d'un mot ?
 
 #define SEG_FBF_BASE    0x96000000
 #define SEG_FBF_SIZE    FB_NPIXEL*FB_NLINE // image 128x128 1 octet par pixel
@@ -99,7 +99,7 @@
 #define SEG_ICU_SIZE    32*NPROCS// 5 registres d'un mot ?
 
 #define SEG_GCD_BASE    0x95000000
-#define SEG_GCD_SIZE    16*NPROCS// 4 registres d'un mot ?
+#define SEG_GCD_SIZE    16// 4 registres d'un mot ?
 
 // SRCID definition
 #define SRCID_PROC      0
@@ -159,15 +159,15 @@ int _main(int argc, char *argv[])
     ///////////////////////////////////////////////////////////////
     int     nprocs              = 4;           // number of processors
     int     ncycles             = 1000000000;       // simulated cycles
-    char    sys_path[256]       = "soft/sys.bin";   // pathname for system code
-    char    app_path[256]       = "soft/app.bin";   // pathname for application code
+    char    sys_path[256]       = "soft_multi/sys.bin";   // pathname for system code
+    char    app_path[256]       = "soft_multi/app.bin";   // pathname for application code
     char    ioc_filename[256]   = "images.raw";  // pathname for the ioc file
     size_t  fbf_size            = 128;              // number of lines = number of pixels
     bool    debug               = false;            // debug activated
     int     from_cycle          = 0;                // debug start cycle
 
     std::cout << std::endl << "********************************************************" << std::endl;
-    std::cout << std::endl << "******        tp4_soclib_mono                     ******" << std::endl;
+    std::cout << std::endl << "******        tp4_soclib_multi                    ******" << std::endl;
     std::cout << std::endl << "********************************************************" << std::endl;
 
     if (argc > 1)
@@ -390,7 +390,7 @@ int _main(int argc, char *argv[])
                                         IntTab(TGTID_FBF),
                                         maptab,
                                         fbf_size,
-                                        128);
+                                        fbf_size);
     // on laisse le sub-sampling par defaut
     std::cout << "fbf constructed" << std::endl;
 

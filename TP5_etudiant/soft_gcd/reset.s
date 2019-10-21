@@ -34,25 +34,25 @@ reset:
 
 # initializes interrupt vector
     la      $26,    _interrupt_vector   # interrupt vector address
-    la      $27,    _isr_timer          # load _ist_timer dans $27
+    la      $27,    _isr_timer          # isr_timer address
     sw      $27,    0($26)              # interrupt_vector[0] <= _isr_timer
-    la      $27,    _isr_tty_get_task0  # load _ist_tty_get_task0
+    la      $27,    _isr_tty_get_task0  # isr_tty_get_task0 address
     sw      $27,    4($26)              # interrupt_vector[1] <= _isr_tty_get_task0
-    la      $27,    _isr_ioc         
+    la      $27,    _isr_ioc            # isr_ioc address
     sw      $27,    8($26)              # interrupt_vector[2] <= _isr_ioc
-    la      $27,    _isr_dma        
-    sw      $27,    12($26)             # interrupt_vector[3] <= _isr_dma
+    la      $27,    _isr_dma            # isr_dma address
+    sw      $27,   12($26)              # interrupt_vector[3] <= _isr_dma
 
 # initializes ICU
     la      $26,    seg_icu_base
-    li      $27,     0b0000001111        # IRQ[0] IRQ[1] IRQ[2] IRQ[3]
-    sw      $27,     8($26)              # ICU_MASK_SET car il y a ICU_INT puis ICE_MASK puis ICU_MASK_SET
+    li      $27,    0xF                 # IRQ[0] IRQ[1] IRQ[2] IRQ[3]
+    sw      $27,    8($26)              # ICU_MASK_SET
 
 # initializes SR register
-    li	    $26,    0x0000FF13
-    mtc0    $26,    $12                 # SR <= user mode / IRQ enable (after eret)
+    li	    $26,    0x0000FF13		
+    mtc0    $26,    $12			# SR <= user mode / IRQ enable (after eret)
 
-# jumps to main 
+# jumps to address stored in first word of seg_data
     la      $26,    seg_data_base
     lw      $26,    0($26)
     mtc0    $26,    $14
@@ -61,4 +61,4 @@ reset:
 	.end	reset
 	.size	reset, .-reset
 
-.set reorder
+	.set reorder
