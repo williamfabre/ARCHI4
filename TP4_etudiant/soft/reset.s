@@ -101,7 +101,7 @@ proc1:
 
         # jump to main in user mode: main[1]
         la      $26,	seg_data_base
-        lw      $26,	0($26)			# $26 <= main[1] 
+        lw      $26,	4($26)			# $26 <= main[1] 
         mtc0	$26,	$14			    # write it in EPC register
         eret
 
