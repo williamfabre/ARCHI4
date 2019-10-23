@@ -1,5 +1,5 @@
 
-mono : tp4_top.desc tp4_top.cpp
+mono : tp5_top.desc tp5_top.cpp
 	soclib-cc -m debug -P -p tp4_top.desc -o simulator.x
 
 cluster : tp5_cluster_top.desc tp5_cluster_top.cpp
