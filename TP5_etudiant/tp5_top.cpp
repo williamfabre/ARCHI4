@@ -284,7 +284,7 @@ int _main(int argc, char *argv[])
 
     Loader loader(sys_path, app_path);
 
-    VciXcacheWrapper<vci_param, Mips32ElIss> proc;
+    VciXcacheWrapper<vci_param, GdbServer<Mips32ElIss> >* proc;
     proc = new VciXcacheWrapper<vci_param, GdbServer<Mips32ElIss> >("proc", 0,maptab,IntTab(SRCID_PROC),
                                                     icache_ways, icache_sets, icache_words,
                                                     dcache_ways, dcache_sets, dcache_words);
