@@ -344,9 +344,9 @@ int _main(int argc, char *argv[])
 
     // name, maptab, cluster, nbinit, nbtarget, default target id
     xbar[0] = new VciLocalCrossbar<vci_param>("xbar1", maptab, 0, 2, 2, 0);
-    xbar[1] = new VciLocalCrossbar<vci_param>("xbar1", maptab, 1, 2, 3, 0);
-    xbar[2] = new VciLocalCrossbar<vci_param>("xbar1", maptab, 2, 1, 3, 0);
-    xbar[3] = new VciLocalCrossbar<vci_param>("xbar1", maptab, 3, 1, 3, 0);
+    xbar[1] = new VciLocalCrossbar<vci_param>("xbar2", maptab, 1, 2, 3, 0);
+    xbar[2] = new VciLocalCrossbar<vci_param>("xbar3", maptab, 2, 1, 3, 0);
+    xbar[3] = new VciLocalCrossbar<vci_param>("xbar4", maptab, 3, 1, 3, 0);
 
     std::cout << " - crossbars constructed" << std::endl;
 
