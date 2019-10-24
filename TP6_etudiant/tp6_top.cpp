@@ -1,6 +1,6 @@
 /**********************************************************************
- * File : tp5_top.cpp
- * Date : 15/11/2010
+ * File : tp6_top.cpp
+ * Date : 01/01/2014
  * Author :  Alain Greiner
  * UPMC - LIP6
  * This program is released under the GNU public license
@@ -39,7 +39,7 @@
 #include "vci_signals.h"
 #include "vci_param.h"
 #include "mapping_table.h"
-#include "vci_vgsb.h"
+#include "vci_vgmn.h"
 #include "vci_xcache_wrapper.h"
 #include "mips32.h"
 #include "vci_multi_tty.h"
@@ -50,10 +50,6 @@
 #include "vci_block_device.h"
 #include "vci_framebuffer.h"
 #include "vci_simple_ram.h"
-#include "gdbserver.h"
-
-
-
 
 #define SEG_RESET_BASE  0xBFC00000
 #define SEG_RESET_SIZE  0x00001000
@@ -61,41 +57,42 @@
 #define SEG_KERNEL_BASE 0x80000000
 #define SEG_KERNEL_SIZE 0x00004000
 
-#define SEG_KUNC_BASE   0x81000000
-#define SEG_KUNC_SIZE   0x00001000
-
-#define SEG_KDATA_BASE  0x82000000
+#define SEG_KDATA_BASE  0x81000000
 #define SEG_KDATA_SIZE  0x00004000
 
-#define SEG_DATA_BASE   0x01000000
-#define SEG_DATA_SIZE   0x00004000
+#define SEG_KUNC_BASE   0x82000000
+#define SEG_KUNC_SIZE   0x00001000
 
 #define SEG_CODE_BASE   0x00400000
 #define SEG_CODE_SIZE   0x00004000
+
+#define SEG_DATA_BASE   0x01000000
+#define SEG_DATA_SIZE   0x00004000
 
 #define SEG_STACK_BASE  0x02000000
 #define SEG_STACK_SIZE  0x01000000
 
 #define SEG_TTY_BASE    0x90000000
-#define SEG_TTY_SIZE    4*32*4 // 4 registres d'un mot par terminal pour 32 terminaux ?
+#define SEG_TTY_SIZE    0x00000040
+
 #define SEG_TIM_BASE    0x91000000
-#define SEG_TIM_SIZE    4*4 // 4 registres d'un mot ?
+#define SEG_TIM_SIZE    0x00000040
 
 #define SEG_IOC_BASE    0x92000000
-#define SEG_IOC_SIZE    9*4 // 9 registres d'un mot ?
+#define SEG_IOC_SIZE    0x00000020
 
 #define SEG_DMA_BASE    0x93000000
-#define SEG_DMA_SIZE    5*4 // 5 registres d'un mot ?
-
-#define SEG_FBF_BASE    0x96000000
-//#define SEG_FBF_SIZE    128*128*1 // image 128x128 1 octet par pixel
-#define SEG_FBF_SIZE    0x411000
-
-#define SEG_ICU_BASE    0x9F000000
-#define SEG_ICU_SIZE    5*4 // 5 registres d'un mot ?
+#define SEG_DMA_SIZE    0x00000014
 
 #define SEG_GCD_BASE    0x95000000
-#define SEG_GCD_SIZE    4*4  // 4 registres d'un mot ?
+#define SEG_GCD_SIZE    0x00000014
+
+#define SEG_FBF_BASE    0x96000000
+#define SEG_FBF_SIZE    0x00004000
+
+#define SEG_ICU_BASE    0x9F000000
+#define SEG_ICU_SIZE    0x00000014
+
 // SRCID definition
 #define SRCID_PROC      0
 #define SRCID_IOC       1
@@ -120,8 +117,8 @@
 #define clen_size       1
 #define rflag_size      1
 #define srcid_size      12
-#define trdid_size      1
 #define pktid_size      1
+#define trdid_size      4
 #define wrplen_size     1
 
 // Cache parameters definition
@@ -153,15 +150,18 @@ int _main(int argc, char *argv[])
     // command line arguments
     ///////////////////////////////////////////////////////////////
     int     ncycles             = 1000000000;       // simulated cycles
-    char    sys_path[256]       = "soft/sys.bin";   // pathname for system code
-    char    app_path[256]       = "soft/app.bin";   // pathname for application code
-    char    ioc_filename[256]   = "images.raw";  // pathname for the ioc file
+    char    sys_path[256]       = "soft/sys.bin";   // pathname for the system code
+    char    app_path[256]       = "soft/app.bin";   // pathname for the application code
+    char    ioc_filename[256]   = "to_be_defined";  // pathname for the ioc file
     size_t  fbf_size            = 128;              // number of lines = number of pixels
-    bool    debug               = false;            // debug activated
+    bool    debug_ok            = false;            // debug activated
     int     from_cycle          = 0;                // debug start cycle
+    bool    stats_ok            = false;            // statistics activated
+    int     stats_period        = 100000;           // statistics periodicity
+    int     noc_latency         = 20;               // intrinsic NOC latency
 
     std::cout << std::endl << "********************************************************" << std::endl;
-    std::cout << std::endl << "******        tp4_soclib_mono                     ******" << std::endl;
+    std::cout << std::endl << "******        tp6_soclib                          ******" << std::endl;
     std::cout << std::endl << "********************************************************" << std::endl;
 
     if (argc > 1)
@@ -174,8 +174,13 @@ int _main(int argc, char *argv[])
             }
             else if( (strcmp(argv[n],"-DEBUG") == 0) && (n+1<argc) )
             {
-                debug = true;
+                debug_ok = true;
                 from_cycle = atoi(argv[n+1]);
+            }
+            else if( (strcmp(argv[n],"-STATS") == 0) && (n+1<argc) )
+            {
+                stats_ok = true;
+                stats_period = atoi(argv[n+1]);
             }
             else if( (strcmp(argv[n],"-SYS") == 0) && (n+1<argc) )
             {
@@ -193,6 +198,10 @@ int _main(int argc, char *argv[])
             {
                 fbf_size = atoi(argv[n+1]) ;
             }
+            else if( (strcmp(argv[n],"-LATENCY") == 0) && (n+1<argc) )
+            {
+                noc_latency = atoi(argv[n+1]);
+            }
             else
             {
                 std::cout << "   Arguments on the command line are (key,value) couples." << std::endl;
@@ -204,6 +213,8 @@ int _main(int argc, char *argv[])
                 std::cout << "   -SYS sys_elf_pathname" << std::endl;
                 std::cout << "   -APP app_elf_pathname" << std::endl;
                 std::cout << "   -DEBUG debug_start_cycle" << std::endl;
+                std::cout << "   -STATS statistics_period" << std::endl;
+                std::cout << "   -LATENCY intrinsic_noc_latency" << std::endl;
                 exit(0);
             }
         }
@@ -212,13 +223,14 @@ int _main(int argc, char *argv[])
     std::cout << "    ncycles      = " << ncycles << std::endl;
     std::cout << "    sys_pathname = " << sys_path << std::endl;
     std::cout << "    app_pathname = " << app_path << std::endl;
-    std::cout << "    ioc_filename = " << ioc_filename << std::endl;
+    std::cout << "    ioc_pathname = " << ioc_filename << std::endl;
     std::cout << "    icache_sets  = " << icache_sets << std::endl;
     std::cout << "    icache_words = " << icache_words << std::endl;
     std::cout << "    icache_ways  = " << icache_ways << std::endl;
     std::cout << "    dcache_sets  = " << dcache_sets << std::endl;
     std::cout << "    dcache_words = " << dcache_words << std::endl;
     std::cout << "    dcache_ways  = " << dcache_ways << std::endl;
+    std::cout << "    noc_latency  = " << noc_latency << std::endl;
 
     //////////////////////////////////////////////////////////////////////////
     // Mapping Table
@@ -285,8 +297,8 @@ int _main(int argc, char *argv[])
 
     Loader loader(sys_path, app_path);
 
-    VciXcacheWrapper<vci_param, GdbServer<Mips32ElIss> >* proc;
-    proc = new VciXcacheWrapper<vci_param, GdbServer<Mips32ElIss> >("proc", 0,maptab,IntTab(SRCID_PROC),
+    VciXcacheWrapper<vci_param, Mips32ElIss >* proc;
+    proc = new VciXcacheWrapper<vci_param,Mips32ElIss>("proc", 0,maptab,IntTab(SRCID_PROC),
                                                     icache_ways, icache_sets, icache_words,
                                                     dcache_ways, dcache_sets, dcache_words);
 
@@ -309,16 +321,17 @@ int _main(int argc, char *argv[])
     icu = new VciIcu<vci_param>("icu", IntTab(TGTID_ICU), maptab, 4);
 
     VciDma<vci_param>* dma;
-    dma = new VciDma<vci_param>("dma", maptab ,IntTab(SRCID_DMA) ,IntTab(TGTID_DMA), 4); // Burst size 4 ?
+    dma = new VciDma<vci_param>("dma", maptab, IntTab(SRCID_DMA), IntTab(TGTID_DMA), 128);
 
     VciFrameBuffer<vci_param>* fbf;
-    fbf = new VciFrameBuffer<vci_param>("fbf", IntTab(TGTID_FBF), maptab, fbf_size, 128); // on laisse le sub-sampling par defaut
+    fbf = new VciFrameBuffer<vci_param>("fbf", IntTab(TGTID_FBF), maptab, fbf_size, fbf_size);
 
     VciBlockDevice<vci_param>* ioc;
-    ioc = new VciBlockDevice<vci_param>("ioc", maptab, IntTab(SRCID_IOC), IntTab(TGTID_IOC), ioc_filename); // block size par defaut (512) et latency par defaut (0)
+    ioc = new VciBlockDevice<vci_param>("ioc", maptab, IntTab(SRCID_IOC), 
+                                         IntTab(TGTID_IOC), ioc_filename, 512, 200000);
 
-    VciVgsb<vci_param>* bus;
-    bus = new VciVgsb<vci_param>("bus", maptab, 3, 9);
+    VciVgmn<vci_param>* noc;
+    noc = new VciVgmn<vci_param>("noc", maptab, 3, 9, noc_latency, 16);
 
     //////////////////////////////////////////////////////////////////////////
     // Net-List
@@ -380,20 +393,20 @@ int _main(int argc, char *argv[])
     dma->p_vci_target               (signal_vci_tgt_dma);
     dma->p_irq                      (signal_irq_dma);
 
-    bus->p_clk                      (signal_clk);
-    bus->p_resetn                   (signal_resetn);
-    bus->p_to_initiator[SRCID_PROC] (signal_vci_init_proc);
-    bus->p_to_initiator[SRCID_DMA]  (signal_vci_init_dma);
-    bus->p_to_initiator[SRCID_IOC]  (signal_vci_init_ioc);
-    bus->p_to_target[TGTID_ROM]     (signal_vci_tgt_rom);
-    bus->p_to_target[TGTID_RAM]     (signal_vci_tgt_ram);
-    bus->p_to_target[TGTID_TTY]     (signal_vci_tgt_tty);
-    bus->p_to_target[TGTID_GCD]     (signal_vci_tgt_gcd);
-    bus->p_to_target[TGTID_TIM]     (signal_vci_tgt_tim);
-    bus->p_to_target[TGTID_ICU]     (signal_vci_tgt_icu);
-    bus->p_to_target[TGTID_DMA]     (signal_vci_tgt_dma);
-    bus->p_to_target[TGTID_FBF]     (signal_vci_tgt_fbf);
-    bus->p_to_target[TGTID_IOC]     (signal_vci_tgt_ioc);
+    noc->p_clk                      (signal_clk);
+    noc->p_resetn                   (signal_resetn);
+    noc->p_to_initiator[SRCID_PROC] (signal_vci_init_proc);
+    noc->p_to_initiator[SRCID_DMA]  (signal_vci_init_dma);
+    noc->p_to_initiator[SRCID_IOC]  (signal_vci_init_ioc);
+    noc->p_to_target[TGTID_ROM]     (signal_vci_tgt_rom);
+    noc->p_to_target[TGTID_RAM]     (signal_vci_tgt_ram);
+    noc->p_to_target[TGTID_TTY]     (signal_vci_tgt_tty);
+    noc->p_to_target[TGTID_GCD]     (signal_vci_tgt_gcd);
+    noc->p_to_target[TGTID_TIM]     (signal_vci_tgt_tim);
+    noc->p_to_target[TGTID_ICU]     (signal_vci_tgt_icu);
+    noc->p_to_target[TGTID_DMA]     (signal_vci_tgt_dma);
+    noc->p_to_target[TGTID_FBF]     (signal_vci_tgt_fbf);
+    noc->p_to_target[TGTID_IOC]     (signal_vci_tgt_ioc);
 
     //////////////////////////////////////////////////////////////////////////
     // simulation
@@ -406,24 +419,34 @@ int _main(int argc, char *argv[])
     signal_resetn = true;
     for ( int n=1 ; n<ncycles ; n++ )
     {
-        if( debug && (n > from_cycle) )
+        if( debug_ok && (n > from_cycle) )
         {
             std::cout << "***************** cycle " << std::dec << n << std::endl;
             proc->print_trace(1);
-            bus->print_trace();
-            timer->print_trace();
             rom->print_trace();
             ram->print_trace();
-            if( signal_irq_proc.read() ) std::cout << "IRQ_PROC" << std::endl;
-            if( signal_irq_tim.read() )  std::cout << "IRQ_TIM"  << std::endl;
-            if( signal_irq_tty.read() )  std::cout << "IRQ_TTY"  << std::endl;
-            if( signal_irq_ioc.read() )  std::cout << "IRQ_IOC"  << std::endl;
-            if( signal_irq_dma.read() )  std::cout << "IRQ_DMA"  << std::endl;
         }
+        if( stats_ok && ( n%stats_period == 1 ) )
+        {
+            proc->print_stats();
+        }
+
         sc_start( sc_time( 1 , SC_NS ) ) ;
     }
 
     sc_stop();
+
+    delete proc;
+    delete rom;
+    delete ram;
+    delete tty;
+    delete timer;
+    delete icu;
+    delete dma;
+    delete gcd;
+    delete fbf;
+    delete ioc;
+    delete noc;
 
     return(0);
 

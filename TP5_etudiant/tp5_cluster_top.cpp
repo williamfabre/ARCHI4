@@ -64,65 +64,66 @@
 // - ROM in cluster 3
 // - TTY in cluster 3
 
-#define SEG_KERNEL_BASE  TO BE COMPLETED   // cluster 0 / tgt 0 / protected
+#define SEG_KERNEL_BASE  0x80100000         // cluster 0 / tgt 0 / protected
 #define SEG_KERNEL_SIZE  0x00004000
 
-#define SEG_KDATA_BASE   TO BE COMPLETED    // cluster 0 / tgt 0 / protected
+#define SEG_KDATA_BASE   0x80200000         // cluster 0 / tgt 0 / protected
 #define SEG_KDATA_SIZE   0x00004000
 
-#define SEG_KUNC_BASE    TO BE COMPLETED    // cluster 0 / tgt 0 / protected
+#define SEG_KUNC_BASE    0x80300000         // cluster 0 / tgt 0 / protected
 #define SEG_KUNC_SIZE    0x00001000
 
-#define SEG_CODE_BASE    TO BE COMPLETED    // cluster 3 / tgt 0
+#define SEG_CODE_BASE    0x30100000         // cluster 3 / tgt 0
 #define SEG_CODE_SIZE    0x00004000
 
-#define SEG_DATA_BASE    TO BE COMPLETED    // cluster 3 / tgt 0
+#define SEG_DATA_BASE    0x30200000         // cluster 3 / tgt 0
 #define SEG_DATA_SIZE    0x00010000
 
-#define SEG_STACK0_BASE  TO BE COMPLETED    // cluster 0 / tgt 0
-#define SEG_STACK1_BASE  TO BE COMPLETED    // cluster 1 / tgt 0
-#define SEG_STACK2_BASE  TO BE COMPLETED    // cluster 2 / tgt 0
-#define SEG_STACK3_BASE  TO BE COMPLETED    // cluster 3 / tgt 0
+#define SEG_STACK0_BASE  0x00000000         // cluster 0 / tgt 0
+#define SEG_STACK1_BASE  0x10000000         // cluster 1 / tgt 0
+#define SEG_STACK2_BASE  0x20000000         // cluster 2 / tgt 0
+#define SEG_STACK3_BASE  0x30000000         // cluster 3 / tgt 0
 #define SEG_STACK_SIZE   0x00010000
 
-#define SEG_TTY_BASE     TO BE COMPLETED    // cluster 3 / tgt 1 / protected
+#define SEG_TTY_BASE     0xB1000000         // cluster 3 / tgt 1 / protected
 #define SEG_TTY_SIZE     0x00001000
 
-#define SEG_TIM_BASE     TO BE COMPLETED    // cluster 2 / tgt 1 / protected
+#define SEG_TIM_BASE     0xA1000000         // cluster 2 / tgt 1 / protected
 #define SEG_TIM_SIZE     0x00001000
 
-#define SEG_IOC_BASE     TO BE COMPLETED    // cluster 0 / tgt 1 / protected
+#define SEG_IOC_BASE     0x81000000         // cluster 0 / tgt 1 / protected
 #define SEG_IOC_SIZE     0x00001000
 
-#define SEG_DMA_BASE     TO BE COMPLETED    // cluster 1 / tgt 2 / protected
+#define SEG_DMA_BASE     0x92000000         // cluster 1 / tgt 2 / protected
 #define SEG_DMA_SIZE     0x00001000
 
-#define SEG_FBF_BASE     TO BE COMPLETED    // cluster 2 / tgt 2 / protected
-#define SEG_FBF_SIZE     0x00010000
+#define SEG_FBF_BASE     0xA2000000         // cluster 2 / tgt 2 / protected
+#define SEG_FBF_SIZE     0x01000000
 
-#define SEG_ICU_BASE     TO BE COMPLETED    // cluster 1 / tgt 1 / protected
+#define SEG_ICU_BASE     0x91000000         // cluster 1 / tgt 1 / protected
 #define SEG_ICU_SIZE     0x00001000
 
-#define SEG_ROM_BASE     TO BE COMPLETED    // cluster 3 / tgt 2 / protected
+// adresse bfc de base
+#define SEG_ROM_BASE     0xBFC00000         // cluster 3 / tgt 2 / protected
 #define SEG_ROM_SIZE     0x00010000
 
 // SRCID.LID  definition
 // IOC and DMA are in different clusters
-#define SRCID_PROC      TO BE COMPLETED
-#define SRCID_IOC       TO BE COMPLETED
-#define SRCID_DMA       TO BE COMPLETED
+#define SRCID_PROC      0
+#define SRCID_IOC       1
+#define SRCID_DMA       1
 
-// TGTID.LID  definition: 
+// TGTID.LID  definition:
 // IOC, TTY, TIM, ICU are in different clusters
 // DMA, FBF, ROM are in different clusters
-#define TGTID_RAM       TO BE COMPLETED
-#define TGTID_TTY       TO BE COMPLETED
-#define TGTID_TIM       TO BE COMPLETED
-#define TGTID_ICU       TO BE COMPLETED
-#define TGTID_IOC       TO BE COMPLETED
-#define TGTID_DMA       TO BE COMPLETED
-#define TGTID_FBF       TO BE COMPLETED
-#define TGTID_ROM       TO BE COMPLETED
+#define TGTID_RAM       0
+#define TGTID_TTY       1
+#define TGTID_TIM       2
+#define TGTID_ICU       2
+#define TGTID_IOC       1
+#define TGTID_DMA       1
+#define TGTID_FBF       1
+#define TGTID_ROM       2
 
 // VCI fields width definition
 #define cell_size       4
@@ -165,9 +166,9 @@ int _main(int argc, char *argv[])
     // command line arguments
     ///////////////////////////////////////////////////////////////
     int     ncycles             = 1000000000;       // simulated cycles
-    char    sys_path[256]       = "soft/sys.bin";   // pathname for system code
-    char    app_path[256]       = "soft/app.bin";   // pathname for application code
-    char    ioc_filename[256]   = "to_be_defined";  // pathname for the ioc file
+    char    sys_path[256]       = "soft_gcd/sys.bin";   // pathname for system code
+    char    app_path[256]       = "soft_gcd/app.bin";   // pathname for application code
+    char    ioc_filename[256]   = "images.raw";  // pathname for the ioc file
     size_t  fbf_size            = 128;              // number of lines = number of pixels
     bool    debug               = false;            // debug activated
     int     from_cycle          = 0;                // debug start cycle
@@ -295,7 +296,7 @@ int _main(int argc, char *argv[])
 
     ////////////////////////////////////////////////////////////////////
     // VCI Components : 4 clusters
-    // Each cluster contains 1 processor, 1 RAM, 1 TTY, 1 TIMER, 
+    // Each cluster contains 1 processor, 1 RAM, 1 TTY, 1 TIMER,
     // 1 ICU and a LOCAL_CROSSBAR.
     // The cluster 0 contains IOC.
     // The cluster 1 contains DMA and ICU.
@@ -340,42 +341,58 @@ int _main(int argc, char *argv[])
 
     std::cout << " - procs and rams constructed" << std::endl;
 
-    xbar[0] = new VciLocalCrossbar<vci_param>( TO BE COMPLETED );
-    xbar[1] = new VciLocalCrossbar<vci_param>( TO BE COMPLETED );
-    xbar[2] = new VciLocalCrossbar<vci_param>( TO BE COMPLETED );
-    xbar[3] = new VciLocalCrossbar<vci_param>( TO BE COMPLETED );
+    // name, maptab, cluster, nbinit, nbtarget, default target id
+    xbar[0] = new VciLocalCrossbar<vci_param>("xbar1", maptab, 0, 2, 2, 0);
+    xbar[1] = new VciLocalCrossbar<vci_param>("xbar1", maptab, 1, 2, 3, 0);
+    xbar[2] = new VciLocalCrossbar<vci_param>("xbar1", maptab, 2, 1, 3, 0);
+    xbar[3] = new VciLocalCrossbar<vci_param>("xbar1", maptab, 3, 1, 3, 0);
 
     std::cout << " - crossbars constructed" << std::endl;
 
-    tty     = new VciMultiTty<vci_param>( TO BE COMPLETED );
+    //tty     = new VciMultiTty<vci_param>( TO BE COMPLETED );
+    tty = new VciMultiTty<vci_param>("tty", IntTab(3, TGTID_TTY), maptab, "tty", NULL);
 
     std::cout << " - tty constructed" << std::endl;
 
-    tim    = new VciTimer<vci_param>( TO BE COMPLETED );
+    //tim    = new VciTimer<vci_param>( TO BE COMPLETED );
+    tim = new VciTimer<vci_param>("timer", IntTab(2, TGTID_TIM), maptab, 1);
 
     std::cout << " - timer constructed" << std::endl;
 
-    icu    = new VciMultiIcu<vci_param>( TO BE COMPLETED );
+    //icu    = new VciMultiIcu<vci_param>( TO BE COMPLETED );
+    icu = new VciMultiIcu<vci_param>("icu", IntTab(1, TGTID_ICU), maptab, 32, 4);
 
     std::cout << " - icu constructed" << std::endl;
 
-    ioc    = new VciBlockDevice<vci_param>( TO BE COMPLETED );
+    //ioc    = new VciBlockDevice<vci_param>( TO BE COMPLETED );
+    ioc = new VciBlockDevice<vci_param>("ioc", maptab, IntTab(0, SRCID_IOC),
+                                         IntTab(0, TGTID_IOC), ioc_filename, 512, 200000);
 
     std::cout << " - ioc constructed" << std::endl;
 
-    dma    = new VciMultiDma<vci_param>( TO BE COMPLETED );
+    //dma    = new VciMultiDma<vci_param>( TO BE COMPLETED ); le dernier
+    //argument c'est le noombre de ligne necessaire
+    dma = new VciMultiDma<vci_param>("dma", maptab, IntTab(1, SRCID_DMA), IntTab(TGTID_DMA), 128, 4);
 
     std::cout << " - dma constructed" << std::endl;
 
-    fbf    = new VciFrameBuffer<vci_param>( TO BE COMPLETED );
+    //fbf    = new VciFrameBuffer<vci_param>( TO BE COMPLETED );
+    fbf = new VciFrameBuffer<vci_param>("fbf", IntTab(2, TGTID_FBF), maptab, fbf_size, fbf_size);
 
     std::cout << " - fbf constructed" << std::endl;
 
-    rom = new VciSimpleRam<vci_param>( TO BE COMPLETED );
+    //rom = new VciSimpleRam<vci_param>( TO BE COMPLETED );
+    rom = new VciSimpleRam<vci_param>("rom", IntTab(3, TGTID_ROM), maptab, loader);
 
     std::cout << " - rom constructed" << std::endl;
 
-    noc = new VciVgmn<vci_param>( TO BE COMPLETED );
+    //noc = new VciVgmn<vci_param>( TO BE COMPLETED );
+
+    // name, mapping table, nb init, nb target, latency min, fifo depth
+    // au total il y a bien 6 maitre et 10 esclaves si on sommes les clusters
+    // mais ceci est une reponse de stupide car le VGNM est lui connecte aux
+    // clusters locaux avec chacun 1 acces maitre et un acces esclave donc 4*2
+    noc = new VciVgmn<vci_param>("noc", maptab, 4, 4, 3, 16);
 
     std::cout << " - noc constructed" << std::endl;
 
@@ -475,34 +492,43 @@ int _main(int argc, char *argv[])
     tim->p_clk                 	        (signal_clk);
     tim->p_resetn              	        (signal_resetn);
     tim->p_vci                          (signal_vci_tgt_tim);
-    tim->p_irq[0]              	        TO BE COMPLETED        
-    tim->p_irq[1]              	        TO BE COMPLETED        
-    tim->p_irq[2]              	        TO BE COMPLETED        
-    tim->p_irq[3]              	        TO BE COMPLETED        
+    tim->p_irq[0]              	        (signal_irq_tim[0]);
+    tim->p_irq[1]              	        (signal_irq_tim[1]);
+    tim->p_irq[2]              	        (signal_irq_tim[2]);
+    tim->p_irq[3]              	        (signal_irq_tim[3]);
 
     std::cout << " - tim connected" << std::endl;
 
     icu->p_clk                   	    (signal_clk);
     icu->p_resetn                	    (signal_resetn);
     icu->p_vci                   	    (signal_vci_tgt_icu);
-    icu->p_irq_out[0]                   TO BE COMPLETED        
-    icu->p_irq_out[1]                   TO BE COMPLETED        
-    icu->p_irq_out[2]                   TO BE COMPLETED        
-    icu->p_irq_out[3]                   TO BE COMPLETED        
-    icu->p_irq_in[0]             	    TO BE COMPLETED        
-    icu->p_irq_in[1]             	    TO BE COMPLETED        
-    icu->p_irq_in[2]             	    TO BE COMPLETED        
-    icu->p_irq_in[3]             	    TO BE COMPLETED        
-    icu->p_irq_in[4]             	    TO BE COMPLETED        
-    icu->p_irq_in[5]             	    TO BE COMPLETED        
-    icu->p_irq_in[6]             	    TO BE COMPLETED        
-    icu->p_irq_in[7]             	    TO BE COMPLETED        
-    icu->p_irq_in[8]             	    TO BE COMPLETED        
-    icu->p_irq_in[9]             	    TO BE COMPLETED        
-    icu->p_irq_in[10]             	    TO BE COMPLETED      
-    icu->p_irq_in[11]             	    TO BE COMPLETED      
-    icu->p_irq_in[12]             	    TO BE COMPLETED      
-    
+    icu->p_irq_out[0]                   (signal_irq_proc[0]);
+    icu->p_irq_out[1]                   (signal_irq_proc[1]);
+    icu->p_irq_out[2]                   (signal_irq_proc[2]);
+    icu->p_irq_out[3]                   (signal_irq_proc[3]);
+
+
+    // IRQ TIM
+    icu->p_irq_in[0]                    (signal_irq_tim[0]);
+    icu->p_irq_in[1]                    (signal_irq_tim[1]);
+    icu->p_irq_in[2]                    (signal_irq_tim[2]);
+    icu->p_irq_in[3]                    (signal_irq_tim[3]);
+
+    // IRQ DMA
+    icu->p_irq_in[4]                    (signal_irq_dma[0]);
+    icu->p_irq_in[5]                    (signal_irq_dma[1]);
+    icu->p_irq_in[6]                    (signal_irq_dma[2]);
+    icu->p_irq_in[7]                    (signal_irq_dma[3]);
+
+    // IRQ TTY
+    icu->p_irq_in[8]                    (signal_irq_tty[0]);
+    icu->p_irq_in[9]                    (signal_irq_tty[1]);
+    icu->p_irq_in[10]                   (signal_irq_tty[2]);
+    icu->p_irq_in[11]                   (signal_irq_tty[3]);
+
+    // IRQ IOC
+    icu->p_irq_in[12]                   (signal_irq_ioc);
+
     std::cout << " - icu connected" << std::endl;
 
     rom->p_clk                          (signal_clk);
@@ -521,7 +547,7 @@ int _main(int argc, char *argv[])
     ioc->p_resetn                       (signal_resetn);
     ioc->p_vci_initiator                (signal_vci_ini_ioc);
     ioc->p_vci_target                   (signal_vci_tgt_ioc);
-    ioc->p_irq                          TO BE COMPLETED      
+    ioc->p_irq                          (signal_irq_ioc);
 
     std::cout << " - ioc connected" << std::endl;
 
@@ -529,10 +555,10 @@ int _main(int argc, char *argv[])
     dma->p_resetn                       (signal_resetn);
     dma->p_vci_initiator                (signal_vci_ini_dma);
     dma->p_vci_target                   (signal_vci_tgt_dma);
-    dma->p_irq[0]                       TO BE COMPLETED      
-    dma->p_irq[1]                       TO BE COMPLETED      
-    dma->p_irq[2]                       TO BE COMPLETED      
-    dma->p_irq[3]                       TO BE COMPLETED      
+    dma->p_irq[0]                       (signal_irq_dma[0]);
+    dma->p_irq[1]                       (signal_irq_dma[1]);
+    dma->p_irq[2]                       (signal_irq_dma[2]);
+    dma->p_irq[3]                       (signal_irq_dma[3]);
 
     std::cout << " - dma connected" << std::endl;
 

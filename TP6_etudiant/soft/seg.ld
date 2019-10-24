@@ -26,6 +26,5 @@ seg_ioc_base    = 0x92000000;
 seg_dma_base    = 0x93000000;
 seg_gcd_base    = 0x95000000;
 seg_fb_base     = 0x96000000;
-/*seg_icu_base    = 0x9E000000;*/
 seg_icu_base    = 0x9F000000;
 
