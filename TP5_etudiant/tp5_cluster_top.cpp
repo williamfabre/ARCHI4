@@ -321,7 +321,8 @@ int _main(int argc, char *argv[])
 
     char* proc_name[4] = { "proc0", "proc1", "proc2", "proc3" };
     char* ram_name[4] = { "ram0", "ram1", "ram2", "ram3" };
-
+    std::vector<std::string> ttys;
+    
     for ( size_t i=0 ; i<4 ; i++ )
     {
         proc[i] = new VciXcacheWrapper<vci_param, GdbServer<Mips32ElIss> > (
@@ -350,17 +351,22 @@ int _main(int argc, char *argv[])
     std::cout << " - crossbars constructed" << std::endl;
 
     //tty     = new VciMultiTty<vci_param>( TO BE COMPLETED );
-    tty = new VciMultiTty<vci_param>("tty", IntTab(3, TGTID_TTY), maptab, "tty", NULL);
+    ttys.push_back("tty0");
+    ttys.push_back("tty1");
+    ttys.push_back("tty2");
+    ttys.push_back("tty3");
+
+    tty = new VciMultiTty<vci_param>("tty", IntTab(3, TGTID_TTY), maptab, ttys);
 
     std::cout << " - tty constructed" << std::endl;
 
     //tim    = new VciTimer<vci_param>( TO BE COMPLETED );
-    tim = new VciTimer<vci_param>("timer", IntTab(2, TGTID_TIM), maptab, 1);
+    tim = new VciTimer<vci_param>("timer", IntTab(2, TGTID_TIM), maptab, 4);
 
     std::cout << " - timer constructed" << std::endl;
 
     //icu    = new VciMultiIcu<vci_param>( TO BE COMPLETED );
-    icu = new VciMultiIcu<vci_param>("icu", IntTab(1, TGTID_ICU), maptab, 32, 4);
+    icu = new VciMultiIcu<vci_param>("icu", IntTab(1, TGTID_ICU), maptab, 13, 4);
 
     std::cout << " - icu constructed" << std::endl;
 
@@ -372,7 +378,7 @@ int _main(int argc, char *argv[])
 
     //dma    = new VciMultiDma<vci_param>( TO BE COMPLETED ); le dernier
     //argument c'est le noombre de ligne necessaire
-    dma = new VciMultiDma<vci_param>("dma", maptab, IntTab(1, SRCID_DMA), IntTab(TGTID_DMA), 128, 4);
+    dma = new VciMultiDma<vci_param>("dma", maptab, IntTab(1, SRCID_DMA), IntTab(1, TGTID_DMA), 32, 4);
 
     std::cout << " - dma constructed" << std::endl;
 
