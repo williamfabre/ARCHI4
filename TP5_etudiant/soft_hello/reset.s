@@ -46,23 +46,23 @@ reset:
     addu    $29,    $27, $26		# $29 <= seg_stack_base + proc_id*0x10000000 + 64K
 
     # All processors initialize concurrently interrupt vector: 13 IRQs
-    la      $26,    TO BE COMPLETED     # interrupt vector address
-    la      $27,    TO BE COMPLETED     # isr_timer address
+    la      $26,    _interrupt_vector   # interrupt vector address
+    la      $27,    _isr_timer          # isr_timer address
     sw      $27,    0($26)              # interrupt_vector[0] <= _isr_timer
     sw      $27,    4($26)              # interrupt_vector[1] <= _isr_timer
     sw      $27,    8($26)              # interrupt_vector[2] <= _isr_timer
     sw      $27,   12($26)              # interrupt_vector[3] <= _isr_timer
-    la      $27,    TO BE COMPLETED     # isr_dma address
+    la      $27,   _isr_dma             # isr_dma address
     sw      $27,   16($26)              # interrupt_vector[4] <= _isr_dma  
     sw      $27,   20($26)              # interrupt_vector[5] <= _isr_dma  
     sw      $27,   24($26)              # interrupt_vector[6] <= _isr_dma  
     sw      $27,   28($26)              # interrupt_vector[7] <= _isr_dma  
-    la      $27,    TO BE COMPLETED     # isr_tty address
+    la      $27,   _isr_tty_get         # isr_tty address
     sw      $27,   32($26)              # interrupt_vector[8]  <= _isr_tty_get
     sw      $27,   36($26)              # interrupt_vector[9]  <= _isr_tty_get
     sw      $27,   40($26)              # interrupt_vector[10] <= _isr_tty_get
     sw      $27,   44($26)              # interrupt_vector[11] <= _isr_tty_get
-    la      $27,    TO BE COMPLETED     # isr_ioc address
+    la      $27,   _isr_ioc             # isr_ioc address
     sw      $27,   48($26)              # interrupt_vector[12] <= _isr_ioc
 
     # Each processor computesizes ICU imask address, depending on the proc_id
@@ -73,7 +73,7 @@ reset:
 reset_proc0:
     # Proc 0 set ICU_MASK[0]
     bne     $10,    $0,     reset_proc1
-    li      $26,    TO BE COMPLETED     # IOC[0] TTY[0] DMA[0] TIM[0]
+    li      $26,    0x00001111          # IOC[0] TTY[0] DMA[0] TIM[0]
     sw      $26,    8($12)              # ICU_MASK_SET
 
     # proc 0 jumps to user code
@@ -88,7 +88,7 @@ reset_proc1:
     # Proc 1 set ICU_MASK[1]
     li      $26,    1
     bne     $10,    $26,   reset_proc2
-    li      $26,    TO BE COMPLETED     # TTY[1] DMA[1] TIM[1]
+    li      $26,    0x00000222          # TTY[1] DMA[1] TIM[1]
     sw      $26,    8($12)              # ICU_MASK_SET
 
     # proc 1 jumps to user code
@@ -103,7 +103,7 @@ reset_proc2:
     # Proc 2 set ICU_MASK[2]
     li      $26,    2
     bne     $10,    $26,   reset_proc3
-    li      $26,    TO BE COMPLETED     # TTY[2] DMA[2] TIM[2]
+    li      $26,    0x00000444          # TTY[2] DMA[2] TIM[2]
     sw      $26,    8($12)              # ICU_MASK_SET
 
     # proc 2 jumps to user code
@@ -116,7 +116,7 @@ reset_proc2:
 
 reset_proc3:
     # Proc 3 set ICU_MASK[3]
-    li      $26,    TO BE COMPLETED     # TTY[3] DMA[3] TIM[3]
+    li      $26,    0x00000888          # TTY[3] DMA[3] TIM[3]
     sw      $26,    8($12)              # ICU_MASK_SET
 
     # proc 3 jumps to user code

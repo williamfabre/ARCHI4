@@ -12,19 +12,18 @@ peripherals are not present in the architecture */
 
 seg_reset_base  = 0xBFC00000;
 
-seg_kcode_base  = TO BE COMPLETED
-seg_kdata_base  = TO BE COMPLETED
-seg_kunc_base   = TO BE COMPLETED
+seg_kcode_base  = 0x80100000;
+seg_kdata_base  = 0x80200000;
+seg_kunc_base   = 0x80300000;
 
-seg_code_base   = TO BE COMPLETED
-seg_data_base   = TO BE COMPLETED
-seg_stack_base  = TO BE COMPLETED
+seg_code_base   = 0x30100000;
+seg_data_base   = 0x30200000;
+seg_stack_base  = 0x00000000;
 
-seg_tty_base    = TO BE COMPLETED
-seg_timer_base  = TO BE COMPLETED
-seg_ioc_base    = TO BE COMPLETED
-seg_dma_base    = TO BE COMPLETED
-seg_gcd_base    = TO BE COMPLETED
-seg_fb_base     = TO BE COMPLETED
-seg_icu_base    = TO BE COMPLETED
-
+seg_tty_base    = 0xB1000000;
+seg_timer_base  = 0xA1000000;
+seg_ioc_base    = 0x81000000;
+seg_dma_base    = 0x92000000;
+seg_gcd_base    = 0x93000000;
+seg_fb_base     = 0xA2000000;
+seg_icu_base    = 0x91000000;
