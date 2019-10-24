@@ -93,7 +93,8 @@
 #define SEG_DMA_SIZE    32*NPROCS// 5 registres d'un mot ?
 
 #define SEG_FBF_BASE    0x96000000
-#define SEG_FBF_SIZE    FB_NPIXEL*FB_NLINE // image 128x128 1 octet par pixel
+//#define SEG_FBF_SIZE    FB_NPIXEL*FB_NLINE // image 128x128 1 octet par pixel
+#define SEG_FBF_SIZE    0x411000
 
 #define SEG_ICU_BASE    0x9F000000
 #define SEG_ICU_SIZE    32*NPROCS// 5 registres d'un mot ?
