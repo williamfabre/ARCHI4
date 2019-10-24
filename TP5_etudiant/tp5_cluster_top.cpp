@@ -64,7 +64,7 @@
 // - ROM in cluster 3
 // - TTY in cluster 3
 
-#define SEG_KERNEL_BASE  0x80100000         // cluster 0 / tgt 0 / protected
+#define SEG_KERNEL_BASE  0x80000000         // cluster 0 / tgt 0 / protected
 #define SEG_KERNEL_SIZE  0x00004000
 
 #define SEG_KDATA_BASE   0x80200000         // cluster 0 / tgt 0 / protected

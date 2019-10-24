@@ -12,7 +12,7 @@ peripherals are not present in the architecture */
 
 seg_reset_base  = 0xBFC00000;
 
-seg_kcode_base  = 0x80100000;
+seg_kcode_base  = 0x80000000;
 seg_kdata_base  = 0x80200000;
 seg_kunc_base   = 0x80300000;
 
