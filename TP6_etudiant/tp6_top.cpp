@@ -88,7 +88,7 @@
 #define SEG_GCD_SIZE    0x00000014
 
 #define SEG_FBF_BASE    0x96000000
-#define SEG_FBF_SIZE    0x00004000
+#define SEG_FBF_SIZE    0x411000
 
 #define SEG_ICU_BASE    0x9F000000
 #define SEG_ICU_SIZE    0x00000014

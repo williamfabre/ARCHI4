@@ -38,7 +38,7 @@ __attribute__((constructor)) void main_display()
         }
         base = base + NBLOCS;
         
-        // tty_printf("\n *** completing display at date = %d\n\n ... new image ?\n", proctime());
+        tty_printf("\n *** completing display at date = %d\n\n ... new image ?\n", proctime());
         // tty_getc_irq(&byte);
     }
     exit();
