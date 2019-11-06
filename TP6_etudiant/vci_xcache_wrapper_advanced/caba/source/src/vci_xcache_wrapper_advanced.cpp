@@ -405,7 +405,7 @@ tmpl(void)::transition()
             }
             else                         // non cacheable
             {
-                m_cpt_ins_unc++;
+                //m_cpt_ins_unc++; existe pas fait bugger
                 m_cost_ins_unc_frz++;
 
                 r_icache_addr_save = m_ireq.addr;
@@ -577,7 +577,7 @@ tmpl(void)::transition()
             dcache_cacheable	= m_cacheability_table[(uint64_t)m_dreq.addr];
 
             // dcache_hit, dcache_way, dcache_set, dcache_word & dcache_rdata evaluation
-            dcache_hit 		    = r_dcache.read( m_dreq.addr, &dcache_rdata, &dcache_way, &dcache_set, &dcache_word ) // DONE
+            dcache_hit 		    = r_dcache.read( m_dreq.addr, &dcache_rdata, &dcache_way, &dcache_set, &dcache_word ); // DONE
 
             // Save proc request and cache response
             r_dcache_addr_save      = m_dreq.addr;
@@ -1140,7 +1140,7 @@ tmpl(void)::genMoore()
         p_vci.plen    = (r_vci_cmd_max - r_vci_cmd_min + 1)<<2;
         p_vci.cmd     = vci_param::CMD_WRITE;
         p_vci.pktid   = 0;
-        p_vci.trdid   = r_vci_cmd_cpt; // DONE   (pas sur)                  
+        p_vci.trdid   = r_vci_cmd_cpt.read(); // DONE   (pas sur)                  
         p_vci.srcid   = m_srcid;
         p_vci.cons    = false;
         p_vci.wrap    = false;
