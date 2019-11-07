@@ -547,15 +547,15 @@ tmpl(void)::transition()
     switch ( r_dcache_fsm ) {
     //////////////////////
     case DCACHE_WRITE_REQ:  // only cacheable write are written in wbuf
-    {
-        if( !r_wbuf.write( r_dcache_addr_save.read(), 
-                           r_dcache_be_save.read(), 
+    {// DONE CORRECTED
+        if( !r_wbuf.write( r_dcache_addr_save.read(),
+                           r_dcache_be_save.read(),
                            r_dcache_wdata_save.read(),
-                           true) ) // DONE CORRECTED
+                           true ) ) 
         {
             //  stay in DCACHE_WRITEREQ state if the request is not accepted 
             m_cost_write_frz++;
-            break;     
+            break;
         }
         // If the write request is accepted by the write buffer, 
         // the next state and the processor request parameters are computed
@@ -579,11 +579,12 @@ tmpl(void)::transition()
             dcache_cacheable	= m_cacheability_table[(uint64_t)m_dreq.addr];
 
             // dcache_hit, dcache_way, dcache_set, dcache_word & dcache_rdata evaluation
-            dcache_hit 		    = r_dcache.read( m_dreq.addr,
+            // DONE 
+            dcache_hit 		    = r_dcache.read( m_dreq.addr, 
                                                  &dcache_rdata,
                                                  &dcache_way,
                                                  &dcache_set,
-                                                 &dcache_word ); // DONE 
+                                                 &dcache_word );
 
             // Save proc request and cache response
             r_dcache_addr_save      = m_dreq.addr;
@@ -763,7 +764,7 @@ tmpl(void)::transition()
                             r_dcache_set_save.read(),
                             r_dcache_word_save.read(),
                             r_vci_rsp_fifo_data.read() );
-
+                            
             if ( r_dcache_word_save.read() == m_dcache_words-1 )  // last word
             {
                 r_dcache.victim_update_tag( r_dcache_addr_save.read(),
@@ -1062,8 +1063,8 @@ tmpl(void)::transition()
                 assert( (r_vci_rsp_cpt < m_dcache_words) &&
                 "The VCI response packet for data miss is too long" );
                 r_vci_rsp_cpt          = r_vci_rsp_cpt + 1;
-                vci_rsp_fifo_ins_put  = true; // DONE
-                vci_rsp_fifo_ins_data = p_vci.rdata.read(); // DONE 
+                vci_rsp_fifo_data_put  = true; // DONE
+                vci_rsp_fifo_data_data = p_vci.rdata.read(); // DONE 
                 if ( p_vci.reop.read() ) 
                 {
                     assert( (r_vci_rsp_cpt == m_dcache_words - 1) &&
@@ -1201,7 +1202,7 @@ tmpl(void)::genMoore()
         }
         p_vci.plen = 4;
         p_vci.pktid  = 0;
-        p_vci.trdid  = TYPE_DATA_UNC; // DONE                           
+        p_vci.trdid  = TYPE_DATA_UNC; // DONE
         p_vci.srcid  = m_srcid;
         p_vci.cons   = false;
         p_vci.wrap   = false;
@@ -1218,7 +1219,7 @@ tmpl(void)::genMoore()
         p_vci.plen   = m_icache_words << 2;
         p_vci.cmd    = vci_param::CMD_READ;
         p_vci.pktid  = 0;
-        p_vci.trdid  = TYPE_INS_MISS; // DONE                         
+        p_vci.trdid  = TYPE_INS_MISS; // DONE
         p_vci.srcid  = m_srcid;
         p_vci.cons   = false;
         p_vci.wrap   = false;
@@ -1235,7 +1236,7 @@ tmpl(void)::genMoore()
         p_vci.plen   = 4;
         p_vci.cmd    = vci_param::CMD_READ;
         p_vci.pktid  = 0;
-        p_vci.trdid  = TYPE_INS_UNC; // DONE                            
+        p_vci.trdid  = TYPE_INS_UNC; // DONE
         p_vci.srcid  = m_srcid;
         p_vci.cons   = false;
         p_vci.wrap   = false;
