@@ -1,4 +1,5 @@
 # -*- python -*-
+# Uses('caba:vci_xcache_wrapper_multi', iss_t = 'common:mips32el'),
 
 todo = Platform('caba', 'tp6_top_advanced.cpp',
         uses = [
