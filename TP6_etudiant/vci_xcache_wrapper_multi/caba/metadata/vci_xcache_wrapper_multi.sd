@@ -1,17 +1,17 @@
 
 # -*- python -*-
 
-Module('caba:vci_xcache_wrapper_advanced',
-	classname = 'soclib::caba::VciXcacheWrapperAdvanced',
+Module('caba:vci_xcache_wrapper_multi',
+	classname = 'soclib::caba::VciXcacheWrapperMulti',
 	tmpl_parameters = [
 		parameter.Module('vci_param', default = 'caba:vci_param'),
 		parameter.Module('iss_t'),
 		],
 	header_files = [
-		'../source/include/vci_xcache_wrapper_advanced.h',
+		'../source/include/vci_xcache_wrapper_multi.h',
 		],
 	implementation_files = [
-		'../source/src/vci_xcache_wrapper_advanced.cpp',
+		'../source/src/vci_xcache_wrapper_multi.cpp',
 		],
 	uses = [
 		Uses('caba:base_module'),

@@ -27,8 +27,8 @@
  * Maintainers: alain
  */
 
-#ifndef SOCLIB_CABA_VCI_XCACHE_WRAPPER_ADVANCED_H
-#define SOCLIB_CABA_VCI_XCACHE_WRAPPER_ADVANCED_H
+#ifndef _CABA_VCI_XCACHE_WRAPPER_MULTI_H
+#define _CABA_VCI_XCACHE_WRAPPER_MULTI_H
 
 #include <inttypes.h>
 #include <systemc>
@@ -46,7 +46,7 @@ using namespace sc_core;
 
 ////////////////////////////////////////////
 template<typename vci_param, typename iss_t>
-class VciXcacheWrapperAdvanced
+class VciXcacheWrapperMulti
 ///////////////////////////////////////////
     : public soclib::caba::BaseModule
 {
@@ -94,7 +94,7 @@ class VciXcacheWrapperAdvanced
         RSP_DATA_WRITE,
     };
 
-    enum read_transaction_type_e {
+    enum blocking_transaction_type_e {
         TYPE_DATA_UNC = 0,
         TYPE_DATA_MISS = 1,
         TYPE_INS_UNC = 2,
@@ -197,18 +197,17 @@ private:
     uint32_t m_cost_data_miss_frz;          // number of frozen cycles related to data miss
     uint32_t m_cost_data_unc_frz;           // number of frozen cycles related to uncached data
     uint32_t m_cost_ins_miss_frz;           // number of frozen cycles related to ins miss
-    uint32_t m_cost_ins_unc_frz;            // number of frozen cycles related to uncached ins 
 
     uint32_t m_count_write_transaction;     // number of VCI write transactions
     uint32_t m_length_write_transaction;    // cumulated length for VCI WRITE transactions
 
 protected:
 
-    SC_HAS_PROCESS(VciXcacheWrapperAdvanced);
+    SC_HAS_PROCESS(VciXcacheWrapperMulti);
 
 public:
 
-    VciXcacheWrapperAdvanced(
+    VciXcacheWrapperMulti(
         sc_module_name insname,
         int proc_id,
         const soclib::common::MappingTable &mt,
@@ -222,7 +221,7 @@ public:
         size_t wbuf_nwords,
         size_t wbuf_nlines);
 
-    ~VciXcacheWrapperAdvanced();
+    ~VciXcacheWrapperMulti();
 
     void print_stats();
     void print_trace( size_t mode = 0 );
