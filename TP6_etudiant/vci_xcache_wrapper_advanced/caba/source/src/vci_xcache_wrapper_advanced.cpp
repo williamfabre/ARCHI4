@@ -1140,7 +1140,9 @@ tmpl(void)::genMoore()
         p_vci.plen    = (r_vci_cmd_max - r_vci_cmd_min + 1)<<2;
         p_vci.cmd     = vci_param::CMD_WRITE;
         p_vci.pktid   = 0;
-        p_vci.trdid   = r_vci_cmd_cpt.read(); // DONE   (pas sur)                  
+        //p_vci.trdid   = r_vci_cmd_cpt.read(); // UNDONE   (pas sur)
+        // "the various transactions are identified by the TRDID field"
+        p_vci.trdid   = r_wbuf.getIndex() + (1<<(vci_param::T-1)); // DONE wtfk
         p_vci.srcid   = m_srcid;
         p_vci.cons    = false;
         p_vci.wrap    = false;
@@ -1157,7 +1159,7 @@ tmpl(void)::genMoore()
         p_vci.plen   = m_dcache_words << 2;
         p_vci.cmd    = vci_param::CMD_READ;
         p_vci.pktid  = 0;
-        p_vci.trdid  = TYPE_DATA_MISS; // DONE                          
+        p_vci.trdid  = TYPE_DATA_MISS; // DONE
         p_vci.srcid  = m_srcid;
         p_vci.cons   = false;
         p_vci.wrap   = false;
