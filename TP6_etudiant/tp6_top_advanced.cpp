@@ -41,6 +41,7 @@
 #include "mapping_table.h"
 #include "vci_vgmn.h"
 #include "vci_xcache_wrapper.h"
+#include "vci_xcache_wrapper.h"
 #include "mips32.h"
 #include "vci_multi_tty.h"
 #include "vci_timer.h"
@@ -128,6 +129,8 @@
 #define dcache_ways     4
 #define dcache_sets     128
 #define dcache_words    8
+#define wbuf_nwords     8
+#define wbuf_nlines     8
 
 int _main(int argc, char *argv[])
 {
@@ -297,10 +300,12 @@ int _main(int argc, char *argv[])
 
     Loader loader(sys_path, app_path);
 
-    VciXcacheWrapper<vci_param, Mips32ElIss >* proc;
-    proc = new VciXcacheWrapper<vci_param,Mips32ElIss>("proc", 0,maptab,IntTab(SRCID_PROC),
+    VciXcacheWrapperAdvanced<vci_param, Mips32ElIss >* proc;
+    proc = new VciXcacheWrapperAdvanced<vci_param,Mips32ElIss>("proc", 0,maptab,IntTab(SRCID_PROC),
                                                     icache_ways, icache_sets, icache_words,
-                                                    dcache_ways, dcache_sets, dcache_words);
+                                                    dcache_ways, dcache_sets, dcache_words,
+                                                    wbuf_nwords,            // added
+                                                    wbuf_nlines);           // added
 
     VciSimpleRam<vci_param>* rom;
     rom = new VciSimpleRam<vci_param>("rom", IntTab(TGTID_ROM), maptab, loader);
