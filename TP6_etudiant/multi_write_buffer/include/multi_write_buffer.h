@@ -42,7 +42,7 @@
 // This write buffer can be described as a set of FSM : one FSM per slot.
 // A slot can be in four states : EMPTY, OPEN, LOCKED, SENT.
 // 1) The write(address, data, be, cacheable) method is used by the 
-//    DCACHE_FM to store a write request in the buffer.
+//    DCACHE_FSM to store a write request in the buffer.
 //    It first search an OPEN slot matching the address.
 //    If not found, it select an EMPTY slot that goes to OPEN.
 //    It returns false if the buffer is full.
