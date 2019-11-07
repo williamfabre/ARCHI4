@@ -330,7 +330,6 @@ tmpl(void)::transition()
         m_cost_data_miss_frz = 0;
         m_cost_data_unc_frz  = 0;
         m_cost_ins_miss_frz  = 0;
-        m_cost_ins_unc_frz   = 0;
 
         m_length_write_transaction = 0;
         m_count_write_transaction  = 0;
@@ -377,8 +376,8 @@ tmpl(void)::transition()
     {
         if (m_ireq.valid ) 
         {
-            data_t  icache_ins;
-            bool    icache_hit;
+            data_t  icache_ins = 0;
+            bool    icache_hit = false;
 
             m_cpt_icache_read++;
             
@@ -405,8 +404,8 @@ tmpl(void)::transition()
             }
             else                         // non cacheable
             {
-                //m_cpt_ins_unc++; existe pas fait bugger
-                m_cost_ins_unc_frz++;
+                m_cpt_ins_miss++;
+                m_cost_ins_miss_frz++;
 
                 r_icache_addr_save = m_ireq.addr;
                 r_icache_fsm 	   = ICACHE_UNC_WAIT;
@@ -548,12 +547,15 @@ tmpl(void)::transition()
     switch ( r_dcache_fsm ) {
     //////////////////////
     case DCACHE_WRITE_REQ:  // only cacheable write are written in wbuf
-    {
-        if( r_wbuf.write(r_dcache_addr_save, r_dcache_be_save, r_dcache_wdata_save, r_dcache_cacheable_save) ) // DONE
+    {// DONE CORRECTED
+        if( !r_wbuf.write( r_dcache_addr_save.read(),
+                           r_dcache_be_save.read(),
+                           r_dcache_wdata_save.read(),
+                           true ) ) 
         {
             //  stay in DCACHE_WRITEREQ state if the request is not accepted 
             m_cost_write_frz++;
-            break;     
+            break;
         }
         // If the write request is accepted by the write buffer, 
         // the next state and the processor request parameters are computed
@@ -577,7 +579,12 @@ tmpl(void)::transition()
             dcache_cacheable	= m_cacheability_table[(uint64_t)m_dreq.addr];
 
             // dcache_hit, dcache_way, dcache_set, dcache_word & dcache_rdata evaluation
-            dcache_hit 		    = r_dcache.read( m_dreq.addr, &dcache_rdata, &dcache_way, &dcache_set, &dcache_word ); // DONE
+            // DONE 
+            dcache_hit 		    = r_dcache.read( m_dreq.addr, 
+                                                 &dcache_rdata,
+                                                 &dcache_way,
+                                                 &dcache_set,
+                                                 &dcache_word );
 
             // Save proc request and cache response
             r_dcache_addr_save      = m_dreq.addr;
@@ -890,17 +897,20 @@ tmpl(void)::transition()
     {
         size_t min;
         size_t max;
-        if ( r_dcache_miss_req )	// DONE
+        //if ( r_dcache_miss_req )	// DONE
+        if ( (r_dcache_miss_req.read()) && (r_wbuf.miss(r_dcache_addr_save.read())) )	
         {
             r_vci_cmd_fsm = CMD_DATA_MISS;
             r_dcache_miss_req = false;
         } 
-        else if ( r_icache_miss_req )	// DONE
+        //else if ( r_icache_miss_req )	// DONE
+        else if ( (r_icache_miss_req.read()) && (r_wbuf.miss(r_icache_addr_save.read())) )	
         {
             r_vci_cmd_fsm = CMD_INS_MISS;
             r_icache_miss_req = false;
         } 
-        else if ( r_dcache_fsm == DCACHE_WRITE_REQ ) // DONE (pas de signal write_req ?)
+        //else if ( r_dcache_fsm == DCACHE_WRITE_REQ ) // DONE (pas de signal write_req ?)
+        else if ( r_wbuf.rok(&min, &max) ) 
         {
             r_vci_cmd_fsm   = CMD_DATA_WRITE;
             r_vci_cmd_min   = min;
@@ -930,7 +940,8 @@ tmpl(void)::transition()
             if (r_vci_cmd_cpt == r_vci_cmd_max) 
             {
                 r_vci_cmd_fsm = CMD_IDLE ;
-                r_wbuf.reset(); // DONE
+                //r_wbuf.reset(); // DONE
+                r_wbuf.sent() ;
             }
         }
         break;
@@ -968,11 +979,11 @@ tmpl(void)::transition()
         if( p_vci.rspval.read() ) 
         {
             r_vci_rsp_cpt = 0;
-            if      ( r_dcache_fsm == DCACHE_WRITE_REQ ) r_vci_rsp_fsm = RSP_DATA_WRITE; // DONE
-            else if ( r_dcache_miss_req )	r_vci_rsp_fsm = RSP_DATA_MISS; // DONE
-            else if ( r_dcache_unc_req )	r_vci_rsp_fsm = RSP_DATA_UNC; // DONE
-            else if ( r_icache_miss_req )	r_vci_rsp_fsm = RSP_INS_MISS; // DONE
-            else if ( r_icache_unc_req )	r_vci_rsp_fsm = RSP_INS_UNC; // DONE
+            if ( (p_vci.rtrdid.read()>>(vci_param::T-1)) != 0 ) r_vci_rsp_fsm = RSP_DATA_WRITE; // DONE
+            else if ( p_vci.rtrdid.read() == TYPE_DATA_MISS ) 	r_vci_rsp_fsm = RSP_DATA_MISS;  // DONE
+            else if ( p_vci.rtrdid.read() == TYPE_DATA_UNC ) 	r_vci_rsp_fsm = RSP_DATA_UNC;   // DONE
+            else if ( p_vci.rtrdid.read() == TYPE_INS_MISS ) 	r_vci_rsp_fsm = RSP_INS_MISS;   // DONE
+            else if ( p_vci.rtrdid.read() == TYPE_INS_UNC ) 	r_vci_rsp_fsm = RSP_INS_UNC;    // DONE
         } 
         break;
     }
@@ -983,9 +994,8 @@ tmpl(void)::transition()
         {
             assert( p_vci.reop.read() && 
                "A VCI response packet must contain one flit for a write transaction" ); 
-
             r_vci_rsp_fsm = RSP_IDLE;
-            r_wbuf.completed(r_vci_cmd_cpt); // DONE (pas sur)                                     
+            r_wbuf.completed( p_vci.rtrdid.read() - (1<<(vci_param::T-1)) ); // DONE
             if ( (p_vci.rerror.read() & 0x1) == 0x1 )  m_iss.setWriteBerr();
         }
         break;
@@ -1004,11 +1014,10 @@ tmpl(void)::transition()
             {
                 assert( (r_vci_rsp_cpt < m_icache_words) &&
                 "The VCI response packet for instruction miss is too long" );
-
                 r_vci_rsp_cpt         = r_vci_rsp_cpt + 1;
                 vci_rsp_fifo_ins_put  = true; // DONE
                 vci_rsp_fifo_ins_data = p_vci.rdata.read(); // DONE
-                if ( p_vci.reop.read() ) 
+                if ( p_vci.reop.read() )
                 {
                     assert( (r_vci_rsp_cpt == m_icache_words - 1) &&
                     "The VCI response packet for instruction miss is too short");
@@ -1025,7 +1034,6 @@ tmpl(void)::transition()
         {
             assert( p_vci.reop.read() and
             "illegal VCI response for uncached instruction");
-
             if( (p_vci.rerror.read()&0x1 != 0) )  // error reported
             {
                 r_vci_rsp_ins_error = true;
@@ -1054,10 +1062,9 @@ tmpl(void)::transition()
             {
                 assert( (r_vci_rsp_cpt < m_dcache_words) &&
                 "The VCI response packet for data miss is too long" );
-
                 r_vci_rsp_cpt          = r_vci_rsp_cpt + 1;
-                vci_rsp_fifo_ins_put  = true; // DONE
-                vci_rsp_fifo_ins_data = p_vci.rdata.read(); // DONE 
+                vci_rsp_fifo_data_put  = true; // DONE
+                vci_rsp_fifo_data_data = p_vci.rdata.read(); // DONE 
                 if ( p_vci.reop.read() ) 
                 {
                     assert( (r_vci_rsp_cpt == m_dcache_words - 1) &&
@@ -1075,7 +1082,6 @@ tmpl(void)::transition()
         {
             assert( p_vci.reop.read() and
             "illegal VCI response for uncached data");
-
             if( (p_vci.rerror.read()&0x1 != 0) )  // error reported
             {
                 r_vci_rsp_data_error = true;
@@ -1140,8 +1146,6 @@ tmpl(void)::genMoore()
         p_vci.plen    = (r_vci_cmd_max - r_vci_cmd_min + 1)<<2;
         p_vci.cmd     = vci_param::CMD_WRITE;
         p_vci.pktid   = 0;
-        //p_vci.trdid   = r_vci_cmd_cpt.read(); // UNDONE   (pas sur)
-        // "the various transactions are identified by the TRDID field"
         p_vci.trdid   = r_wbuf.getIndex() + (1<<(vci_param::T-1)); // DONE wtfk
         p_vci.srcid   = m_srcid;
         p_vci.cons    = false;
@@ -1198,7 +1202,7 @@ tmpl(void)::genMoore()
         }
         p_vci.plen = 4;
         p_vci.pktid  = 0;
-        p_vci.trdid  = TYPE_DATA_UNC; // DONE                           
+        p_vci.trdid  = TYPE_DATA_UNC; // DONE
         p_vci.srcid  = m_srcid;
         p_vci.cons   = false;
         p_vci.wrap   = false;
@@ -1215,7 +1219,7 @@ tmpl(void)::genMoore()
         p_vci.plen   = m_icache_words << 2;
         p_vci.cmd    = vci_param::CMD_READ;
         p_vci.pktid  = 0;
-        p_vci.trdid  = TYPE_INS_MISS; // DONE                         
+        p_vci.trdid  = TYPE_INS_MISS; // DONE
         p_vci.srcid  = m_srcid;
         p_vci.cons   = false;
         p_vci.wrap   = false;
@@ -1232,7 +1236,7 @@ tmpl(void)::genMoore()
         p_vci.plen   = 4;
         p_vci.cmd    = vci_param::CMD_READ;
         p_vci.pktid  = 0;
-        p_vci.trdid  = TYPE_INS_UNC; // DONE                            
+        p_vci.trdid  = TYPE_INS_UNC; // DONE
         p_vci.srcid  = m_srcid;
         p_vci.cons   = false;
         p_vci.wrap   = false;
