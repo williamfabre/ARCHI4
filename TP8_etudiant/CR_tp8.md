@@ -32,27 +32,69 @@ the mailbox by the IPI sent by processor 0
 
 
 
-## Questions sur le bootloader
+## Questions sur le bootloader (/almos-mkh/boot/tsar_mips32/boot.c)
 
 ### À quoi sert le bootloader ?
+- La première tâche du bootloader est de charger en mémoire le code du
+système d'exploitation, initialement stocké sur le disque externe.
 
+- La seconde tâche du bootloader est de charger en mémoire, à partie du disque externe de la machine, le fichier /arch_info.bin situé dans le répertoire racine. Ce fichier définit les caractéristiques de l'architecture matérielle
 
 ### Quels périphériques doit il pouvoir accéder ?
-
+- The 'boot.elf' file (containing the boot-loader binary code) is stored 
+on disk (not in the FAT file system), and must be loaded into memory by 
+the preloader running on the core[0][0] (cxy = 0 / lid = 0).
 
 ### Quels formats de fichier doit-il pouvoir analyser ?
+- The "kernel.elf" and "arch_info.bin" files are supposed to be
+stored on disk in a FAT32 file system.
 
 
 ### Dans quel(s) fichier(s) est rangée la description de la plateforme matérielle ? 
+- La seconde tâche du bootloader est de charger en mémoire, à partie du disque externe de la machine, le fichier /arch_info.bin situé dans le répertoire racine. Ce fichier définit les caractéristiques de l'architecture matérielle
 
+- https://www-soc.lip6.fr/trac/almos-mkh/wiki/arch_info
 
 ### Pourquoi le code du bootloader est-il recopié dans tous les clusters ?
+Pour charger le code les segments kdata et kcode dans chaque clusters, initialiser donc
+1 OS par cluster (pour eviter la congestion d'acces a la memoire pour acceder au code
+du noyau (+ typique des archis CC-NUMA)
 
 
 ### Pourquoi chaque core, a-t-il besoin d'une pile ? où sont-elles placées ?
 
 
 ### Qu'est-ce qu'une IPI ? Comment sont-elles utilisées par le bootloader ? 
+- L'accès au disque externe et le chargement du bootloader ne sont exécutés que par le coeur[0[0] (coeur 0 du cluster 0). Les autres coeurs de la plate-forme commencent à exécuter le code du preloader, mais se bloquent immédiatement en mode basse consommation, et ne seront réveillés que plus tard par une IPI (Inter Processor Interrupt). 
+
+``` c
+
+/*********************************************************************************
+ * This function is called by all CP0s to activate the other CPi cores. 
+ * @ boot_info  : pointer to local 'boot_info_t' structure.
+ *********************************************************************************/
+static void boot_wake_local_cores(boot_info_t * boot_info)
+{
+    unsigned int     core_id;        
+
+    // get pointer on XCU device descriptor in boot_info
+    boot_device_t *  xcu = &boot_info->int_dev[0];
+ 
+    // loop on cores
+    for (core_id = 1; core_id < boot_info->cores_nr; core_id++)
+    {
+
+#if DEBUG_BOOT_WAKUP
+boot_printf("\n[BOOT] core[%x,%d] activated at cycle %d\n",
+boot_info->cxy , core_id , boot_get_proctime() );
+#endif
+        // send an IPI 
+        boot_remote_sw( (xptr_t)(xcu->base + (core_id << 2)) , (uint32_t)boot_entry ); 
+    }
+} // boot_wake_local_cores()
+
+```
+
 
 
 
@@ -60,13 +102,33 @@ the mailbox by the IPI sent by processor 0
 ## Questions sur kernel_init
 
 ### Comment dans chaque cluster, le noyau a-t-il accès à la description de la plate-forme matérielle ?
-
+- the boot_info structure is built by the bootloader, and used by kernel_init.
+it must be the first object in the kdata segment.
 
 ### Comment almos_mkh identifie-t-il les coeurs de la plate-forme matérielle ? 
+- This file contains the ALMOS-MKH. boot-loader for the TSAR architecture. 
+that is a clusterised, shared memory, multi-processor architecture,      
+where each processor core is identified by a composite index [cxy,lid]   
+with one physical memory bank per cluster.                               
 
+``` c
+
+ core[0][0] (cxy = 0 / lid = 0)
+
+
+ ```
 
 ### Les threads kernel IDLE exécutent, sur chaque coeur la fonction kernel_init(). Le thread IDLE est aussi le thread choisi par le scheduler d'un coeur quand tous les autres threads placés sur ce coeur sont bloqués. Où sont rangés les descripteurs de threads IDLE ? Combien y a-t-il de threads idle ?
+- the array of idle threads descriptors must be placed on the first page boundary after
+the boot_info structure in the kdata segment.
 
+```c
+// This variable defines the "idle" threads descriptors array
+__attribute__((section(".kidle")))
+char                 idle_threads[CONFIG_THREAD_DESC_SIZE *
+                                   CONFIG_MAX_LOCAL_CORES]   CONFIG_PPM_PAGE_ALIGNED;
+
+								   ```
 
 ### Pour quelle raison la fonction kernel_init() utilise-t-elle des barrières de synchronisation ? Illustrez votre réponse avec un exemple.
 
@@ -74,13 +136,16 @@ the mailbox by the IPI sent by processor 0
 ### Pour quelle raison, utilise-t-on à la fois des barrières locales et des barrières globales ?
 
 
-### Dans le cas d'une barrière globale, expliquez précisément la valeur du premier argument passé à la fonction xbarrier_wait(). L'API permettant l'accès à une barrière globale est définie dans les fichiers ​almos-mkh/kernel/libk/xbarrier.h et ​almos-mkh/kernel/libk/xbarrier.c.
+### Dans le cas d'une barrière globale, expliquez précisément la valeur du premier argument passé à la fonction xbarrier_wait(). L'API permettant l'accès à une barrière globale est définie dans les fichiers almos-mkh/kernel/libk/xbarrier.h et almos-mkh/kernel/libk/xbarrier.c.
 
 
-### Quel est le rôle de la fonction cluster_init() définie dans le fichier ​almos-mkh/kernel/kern/cluster.c ?
+### Quel est le rôle de la fonction cluster_init() définie dans le fichier almos-mkh/kernel/kern/cluster.c ?
 
 
-### Quelle est l'utilité de la structure de donnée distribuée DQDT ? L'API permettant l'accès à la DQDT est définie dans les fichiers ​almos-mkh/kernel/kern/dqdt.h et ​almos-mkh/kernel/kern/dqdt.c.
+### Quelle est l'utilité de la structure de donnée distribuée DQDT ? L'API permettant l'accès à la DQDT est définie dans les fichiers almos-mkh/kernel/kern/dqdt.h et almos-mkh/kernel/kern/dqdt.c.
 
+-  DQDT, qui permet d'enregistrer le taux d'utilisation de la mémoire dans chaque cluster, ou la charge de chacun des coeurs de la plateforme.
+
+- " 4.3 DQDT (Distributed Quaternary Decision Tree)La décentralisation de la gestion des ressources, grâce à la mise en place d’un  cluster-manager par nœud cc-NUMA, a comme conséquence un manque de connaissance globaleconcernant la disponibilité des ressources. Cette connaissance est nécessaire au noyau pourpouvoir décider sur quel nœud une requête d’allocation mémoire distante peut être satisfaite,sur quel core une nouvelle tâche doit être placée ou encore, vers quel core une tâche doit êtretransférée lors d’une opération d'équilibrage de charge. Dans cette section, nous décrivonsnotre solution à ce problème qui consiste à doter le noyau d’ALMOS d’un mécanismedécentralisé de représentation distribuée des ressources globalement disponibles. Cettereprésentation prend en compte le caractère NUMA de l’architecture. Ce mécanismedécentralisé et ses politiques de prise de décision constituent la DQDT (DistributedQuaternary Desion Tree). ",  from  https://www-soc.lip6.fr/trac/almos/chrome/site/phd_thesis_ghassan_almaless_2014.pdf
 
 ### Quel est le rôle de la fonction lapic_init() ?  
