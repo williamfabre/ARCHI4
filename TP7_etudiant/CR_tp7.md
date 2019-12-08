@@ -2,6 +2,7 @@
 
 
 
+
 ## Quelle est la taille de l'espace d'adressage physique et quelle est la taille de l'espace virtuelle ?
 L'architecture TSAR utilise des processeurs 32bits pour minimiser la consommation énergétique. Chaque application possède donc un espace virtuel limité à 4 Goctets (adresses virtuelles sur 32 bits).
 
@@ -115,6 +116,46 @@ a memory cache. The command must transport both the new data value and the
 signature obtained after the LL transaction. The response returns only a
 Boolean indicating failure/success for the SC transaction. This means that the
 VCI command packet contains two flits and the VCI response packet contains one flit. 
+
+* Exemple d'utilisation de LL/SC dans le fichier hal_remote.c :
+``` c
+///////////////////////////////////////////
+bool_t hal_remote_atomic_cas( xptr_t    xp,
+                              uint32_t  old,
+                              uint32_t  new )
+{
+    uint32_t save_sr;
+	bool_t   isAtomic;
+    uint32_t ptr = (uint32_t)GET_PTR( xp );
+    uint32_t cxy = (uint32_t)GET_CXY( xp );
+
+    hal_disable_irq( &save_sr );
+
+    asm volatile( 
+        ".set noreorder              \n"
+        "mfc2   $15,    $24          \n"  /* $15 <= PADDR_EXT   */ 
+        "mtc2   %4,     $24          \n"  /* PADDR_EXT <= cxy   */   
+        "or     $8,     $0,    %3    \n"  /* $8 <= new          */
+        "ll     $3,    0(%1)         \n"  /* $3 <= *paddr       */
+        "bne    $3,     %2,    1f    \n"  /* if ($3 != old)     */
+        "li     $7,     0            \n"  /* $7 <= 0            */
+        "sc     $8,     (%1)         \n"  /* *paddr <= new      */
+        "or     $7,     $8,    $0    \n"  /* $7 <= atomic       */
+        "sync                        \n"
+        "1:                          \n"
+        "or     %0,     $7,    $0    \n"  /* isAtomic <= $7     */
+        "mtc2   $15,    $24          \n"  /* PADDR_EXT <= $15   */   
+        ".set reorder                \n"
+        : "=&r" (isAtomic) : "r" (ptr), "r" (old) , "r" (new), "r" (cxy) 
+		: "$3", "$7", "$8", "$15" );
+
+    hal_restore_irq( save_sr );
+
+	return isAtomic;
+
+}  // end hal_remote_atomic_cas()
+```
+
 
 ## Combien de réseaux DSPINs indépendants interconnectent les clusters ? Pourquoi ?
  The TSAR architecture uses the DSPIN network on chip infrastructure to define three independent networks.
