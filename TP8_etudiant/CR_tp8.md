@@ -8,11 +8,30 @@
 - Son rôle est de charger en mémoire RAM le code du bootloader spécifique au système d'exploitation qu'on veut charger.
 
 ### Où se trouve stocké le code du preloader au démarrage de la plateforme TSAR? Comment les coeurs accèdent_ils au code du preloader ?
+
+- Lieux exacte du stockage dans le disque (par convention) :
+" the system specific boot-loader stored on disk at RESET_LOADER_LBA" (Dont la valeur est 2, je suppose que c'est le numero de secteur du disque.
+
+``` asm
+
+    /*
+     * Bootstrap Processor jumps to the reset_elf_loader routine passing as argument
+     * the block number in which is loaded the .elf file
+     */
+
+    li      a0,     RESET_LOADER_LBA
+    jal     reset_elf_loader
+    nop
+	```
+
+
+
 - This preloader uses a stack segment allocated in cluster 0 for processor 0.
 - The stack allocation is not performed for other processors as they do not
 need it during the preloader execution. Therefore, this allocation should be
 done by the loaded Operating System.
 (tsar/softs/tsar_boot/src/reset.S)
+
 
 
 ### Comment fait-on pour qu'un code ne soit exécuté que par un seul core ?
@@ -93,7 +112,6 @@ the mailbox by the IPI sent by processor 0
 
 
 
-
 ## Questions sur le bootloader (/almos-mkh/boot/tsar_mips32/boot.c)
 
 ### À quoi sert le bootloader ?
@@ -124,6 +142,21 @@ du noyau (+ typique des archis CC-NUMA)
 
 
 ### Pourquoi chaque core, a-t-il besoin d'une pile ? où sont-elles placées ?
+- Pourquoi :
+	Parce que chaque processeur va avoir ses propres fonctions a executer et l'acces
+	a la pile doit etre "locale" a chaque processeur. (TODO reexpliquer)
+
+- Placement (boot_entry.S) :
+	``` asm
+    /* Initialize stack pointer from lid value  */
+    
+    la      t0,     BOOT_STACK_BASE                     /* t0 <= BOOT_STACK_BASE            */
+    li      k1,     BOOT_STACK_SIZE                     /* k1 <= BOOT_STACK_SIZE            */
+    multu   k1,     t1
+    mflo    k0                                          /* k0 <= BOOT_STACK_SIZE * lid      */
+    subu    sp,     t0,     k0                          /* P[cxy,lid] sp initialized        */ 
+	```
+
 
 
 ### Qu'est-ce qu'une IPI ? Comment sont-elles utilisées par le bootloader ? 
