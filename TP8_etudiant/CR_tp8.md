@@ -123,12 +123,14 @@ with one physical memory bank per cluster.
 the boot_info structure in the kdata segment.
 
 ```c
-// This variable defines the "idle" threads descriptors array
-__attribute__((section(".kidle")))
-char                 idle_threads[CONFIG_THREAD_DESC_SIZE *
-                                   CONFIG_MAX_LOCAL_CORES]   CONFIG_PPM_PAGE_ALIGNED;
 
-								   ```
+// This variable defines the "idle" threads descriptors array
+__attribute__((section(".kidle"))) char idle_threads[CONFIG_THREAD_DESC_SIZE * CONFIG_MAX_LOCAL_CORES]   CONFIG_PPM_PAGE_ALIGNED;
+
+```
+```
+
+
 
 ### Pour quelle raison la fonction kernel_init() utilise-t-elle des barrières de synchronisation ? Illustrez votre réponse avec un exemple.
 
@@ -148,4 +150,4 @@ char                 idle_threads[CONFIG_THREAD_DESC_SIZE *
 
 - " 4.3 DQDT (Distributed Quaternary Decision Tree)La décentralisation de la gestion des ressources, grâce à la mise en place d’un  cluster-manager par nœud cc-NUMA, a comme conséquence un manque de connaissance globaleconcernant la disponibilité des ressources. Cette connaissance est nécessaire au noyau pourpouvoir décider sur quel nœud une requête d’allocation mémoire distante peut être satisfaite,sur quel core une nouvelle tâche doit être placée ou encore, vers quel core une tâche doit êtretransférée lors d’une opération d'équilibrage de charge. Dans cette section, nous décrivonsnotre solution à ce problème qui consiste à doter le noyau d’ALMOS d’un mécanismedécentralisé de représentation distribuée des ressources globalement disponibles. Cettereprésentation prend en compte le caractère NUMA de l’architecture. Ce mécanismedécentralisé et ses politiques de prise de décision constituent la DQDT (DistributedQuaternary Desion Tree). ",  from  https://www-soc.lip6.fr/trac/almos/chrome/site/phd_thesis_ghassan_almaless_2014.pdf
 
-### Quel est le rôle de la fonction lapic_init() ?  
+## Quel est le rôle de la fonction lapic_init() ?  
