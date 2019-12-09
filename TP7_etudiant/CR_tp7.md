@@ -4,7 +4,8 @@
 
 
 ## Quelle est la taille de l'espace d'adressage physique et quelle est la taille de l'espace virtuelle ?
-L'architecture TSAR utilise des processeurs 32bits pour minimiser la consommation énergétique. Chaque application possède donc un espace virtuel limité à 4 Goctets (adresses virtuelles sur 32 bits).
+- L'architecture TSAR utilise des processeurs 32bits pour minimiser la consommation énergétique. Chaque application possède donc un espace virtuel limité à 4 Goctets (adresses virtuelles sur 32 bits).
+- L'espace d'adressage physique a une taille de 1 Tera-octet (adresses physiques sur 40 bits). Les 8 bits de poids fort de l'adresse définissent les coordonnées du cluster cible de la transaction. Le segment de mémoire physique accessible dans un cluster ne peut donc pas avoir une longueur supérieure à 4 Goctets. 
 
 ## Quelles sont les tailles des tables de 1e et et 2e niveau d'une table de page ?
 

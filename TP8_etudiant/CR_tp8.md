@@ -125,11 +125,9 @@ the boot_info structure in the kdata segment.
 ```c
 
 // This variable defines the "idle" threads descriptors array
-__attribute__((section(".kidle"))) char idle_threads[CONFIG_THREAD_DESC_SIZE * CONFIG_MAX_LOCAL_CORES]   CONFIG_PPM_PAGE_ALIGNED;
+__attribute__((section(".kidle"))) char idle_threads[CONFIG_THREAD_DESC_SIZE x CONFIG_MAX_LOCAL_CORES]   CONFIG_PPM_PAGE_ALIGNED;
 
 ```
-```
-
 
 
 ### Pour quelle raison la fonction kernel_init() utilise-t-elle des barrières de synchronisation ? Illustrez votre réponse avec un exemple.
