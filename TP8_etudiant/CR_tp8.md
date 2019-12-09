@@ -21,6 +21,68 @@ done by the loaded Operating System.
 - All other processors wait in a low power consumption mode that the
   processor 0 wakes them using an IPI (Inter Processor Interruption)
 
+- Fonction de reveil de core 0,0:
+
+``` c
+
+/*********************************************************************************
+ * This function is called by CP0 in cluster(0,0) to activate all other CP0s.
+ * It returns the number of CP0s actually activated.
+ ********************************************************************************/
+static uint32_t boot_wake_all_cp0s( void )
+{
+    archinfo_header_t*  header;         // Pointer on ARCHINFO header
+    archinfo_cluster_t* cluster_base;   // Pointer on ARCHINFO clusters base
+    archinfo_cluster_t* cluster;        // Iterator for loop on clusters
+    archinfo_device_t*  device_base;    // Pointer on ARCHINFO devices base
+    archinfo_device_t*  device;         // Iterator for loop on devices
+    uint32_t            cp0_nb = 0;     // CP0s counter
+
+    header       = (archinfo_header_t*)ARCHINFO_BASE;
+    cluster_base = archinfo_get_cluster_base(header);
+    device_base  = archinfo_get_device_base (header); 
+
+    // loop on all clusters 
+    for (cluster = cluster_base;
+         cluster < &cluster_base[header->x_size * header->y_size];
+         cluster++)
+    {
+        // Skip boot cluster.
+        if (cluster->cxy == BOOT_CORE_CXY)
+            continue;
+            
+        // Skip clusters without core (thus without CP0).
+        if (cluster->cores == 0)
+            continue;
+
+        // Skip clusters without device (thus without XICU).
+        if (cluster->devices == 0)
+            continue;
+
+        // search XICU device associated to CP0, and send a WTI to activate it 
+        for (device = &device_base[cluster->device_offset];
+             device < &device_base[cluster->device_offset + cluster->devices];
+             device++)
+        {
+            if (device->type == DEV_TYPE_ICU_XCU)
+            {
+
+#if DEBUG_BOOT_WAKUP
+boot_printf("\n[BOOT] core[%x,0] activated at cycle %d\n",
+cluster->cxy , boot_get_proctime );
+#endif
+
+                boot_remote_sw((xptr_t)device->base, (uint32_t)boot_entry);
+                cp0_nb++;
+            }
+        }
+    }
+    return cp0_nb;
+
+} // boot_wake_cp0()
+
+```
+
 ### A quel moment les cores sortent-ils du preloader ?
 - All other processors, when exiting wait mode, read from XICU the address
 to jump.
@@ -137,6 +199,9 @@ __attribute__((section(".kidle"))) char idle_threads[CONFIG_THREAD_DESC_SIZE x C
 
 
 ### Dans le cas d'une barrière globale, expliquez précisément la valeur du premier argument passé à la fonction xbarrier_wait(). L'API permettant l'accès à une barrière globale est définie dans les fichiers almos-mkh/kernel/libk/xbarrier.h et almos-mkh/kernel/libk/xbarrier.c.
+
+volatile boot_remote_barrier_t  global_barrier;   // synchronize CP0 cores
+volatile boot_remote_barrier_t  local_barrier;    // synchronize cores in one cluster
 
 
 ### Quel est le rôle de la fonction cluster_init() définie dans le fichier almos-mkh/kernel/kern/cluster.c ?
