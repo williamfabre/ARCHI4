@@ -8,7 +8,6 @@
 - Son rôle est de charger en mémoire RAM le code du bootloader spécifique au système d'exploitation qu'on veut charger.
 
 ### Où se trouve stocké le code du preloader au démarrage de la plateforme TSAR? Comment les coeurs accèdent_ils au code du preloader ?
-
 - Lieux exacte du stockage dans le disque (par convention) :
 " the system specific boot-loader stored on disk at RESET_LOADER_LBA" (Dont la valeur est 2, je suppose que c'est le numero de secteur du disque.
 
@@ -22,11 +21,10 @@
     li      a0,     RESET_LOADER_LBA
     jal     reset_elf_loader
     nop
-	```
+
+```
 
 
-
-- This preloader uses a stack segment allocated in cluster 0 for processor 0.
 - The stack allocation is not performed for other processors as they do not
 need it during the preloader execution. Therefore, this allocation should be
 done by the loaded Operating System.
