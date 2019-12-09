@@ -12,7 +12,6 @@ L'architecture TSAR utilise des processeurs 32bits pour minimiser la consommatio
 |---|---|---|---|---|---|
 | 2M bytes page descriptor | (called PTE1)  | 1st level  | 2MO=2^21  | PPN1 (19 bits)  | 2^19 pages possibles |
 | 4K bytes page descriptor | (called PTD1)  | 1st level  | 4KO=2^12  | PPN2 (28 bits)  | 2^28 pages possibles |
-
 | 4K bytes page descriptor | (called PTE1)  | 2nd level  | 4KO=2^12  | soft (8 bits)   | 512 pages possibles  |
 | 4K bytes page descriptor | (called PTD1)  | 2nd level  | 4KO=2^12  | PPN2 (19 bits)  | 2^19 pages possibles |
 
